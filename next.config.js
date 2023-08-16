@@ -10,7 +10,7 @@ const nextConfig = {
   },
   images: {
     loader: 'imgix',
-    path: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://client-staging-green.vercel.app',
+    path: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://staging-admin.vercel.app',
   },
   env: {
     baseApiUrl: process.env.NODE_ENV === 'development'
