@@ -107,6 +107,13 @@ export default function SideBar() {
                     <a>Beta Users</a>
                   </Link>
                 </li>
+
+
+                <li className={rout === 'users' ? 'active' : ''}>
+                  <Link href="/admin/all-userlogs">
+                    <a>User Logs</a>
+                  </Link>
+                </li>
               </ul>
             )}
           </li>{' '}

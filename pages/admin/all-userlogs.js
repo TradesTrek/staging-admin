@@ -54,20 +54,27 @@ export default function AllTransaction() {
     { label: "Bank Name", key: "bankName" },
     { label: "Username", key: "username" },
   ];
+
   useEffect(() => {
-    const fetchBetaUsers = async () => {
-      try {
-    const res  = await axios.get(`${baseUrl}/betaUser`);
-
-    setTransactionList(res.data.data);
- 
-      } catch (error) {
-
-      }
-    };
-
-    fetchBetaUsers();
+    getLogs();
   }, []);
+
+  const getLogs = () => {
+    setIsLoading(true);
+    userService.getUserLogs()
+      .then((res) => {
+        if (res.success) {
+
+          setTransactionList(res.data);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        console.log(err);
+      });
+  };
+
   const getTransaction = (data, page, search) => {
     setIsLoading(true);
     userService
@@ -247,7 +254,7 @@ export default function AllTransaction() {
         <DashboardHeader />
         <div className="contentWrapper">
           <div className="dashboard_content">
-            <h1 className="dashboard__title">Beta Users</h1>
+            <h1 className="dashboard__title">User Logs</h1>
             <div className="btnLists manager">
               <ul>
                 <li>
@@ -382,75 +389,55 @@ export default function AllTransaction() {
                       </th>
                       <th
                         className={
-                          option.accountName == 1
+                          option.username == 1
                             ? "desc"
-                            : option.accountName == -1
+                            : option.username == -1
                             ? "asc"
                             : ""
                         }
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOption({
-                            accountName: option.accountName == 1 ? -1 : 1,
+                            username: option.username == 1 ? -1 : 1,
                           });
                         }}
                       >
-                        Email
+                        Username
                       </th>
                       <th
                         className={
-                          option.accountNumber == 1
+                          option.appFeature == 1
                             ? "desc"
-                            : option.accountNumber == -1
+                            : option.appFeature == -1
                             ? "asc"
                             : ""
                         }
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOption({
-                            accountNumber: option.accountNumber == 1 ? -1 : 1,
+                            appFeature: option.appFeature == 1 ? -1 : 1,
                           });
                         }}
                       >
-                     FullName
+                        App feature
                       </th>
                       <th
                         className={
-                          option.bankName == 1
+                          option.userAction == 1
                             ? "desc"
-                            : option.bankName == -1
+                            : option.userAction == -1
                             ? "asc"
                             : ""
                         }
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOption({
-                            bankName: option.bankName == 1 ? -1 : 1,
+                            userAction: option.userAction == 1 ? -1 : 1,
                           });
                         }}
                       >
-                        Gender
+                        User Action
                       </th>
-                      <th
-                        className={
-                          option["user.username"] == 1
-                            ? "desc"
-                            : option["user.username"] == -1
-                            ? "asc"
-                            : ""
-                        }
-                        style={{ cursor: "pointer" }}
-                        onClick={() => {
-                          setOption({
-                            ["user.username"]:
-                              option["user.username"] == 1 ? -1 : 1,
-                          });
-                        }}
-                      >
-                       Phone Number
-                      </th>
-
-                    
                       <th
                         className={
                           option.status == 1
@@ -468,8 +455,24 @@ export default function AllTransaction() {
                       >
                         Status
                       </th>
-                   
-                  
+
+                      <th
+                        className={
+                          option.createdAt == 1
+                            ? "desc"
+                            : option.createdAt == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            createdAt: option.createdAt == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Time
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -479,15 +482,11 @@ export default function AllTransaction() {
                         return (
                           <tr key={i}>
                             <td>{(currentPage - 1) * 10 + i + 1}</td>
-                            <td>{item.email}</td>
-                            <td>{item.fullName}</td>
-                            <td>{item.gender}</td>
-                            <td>{item.phoneNumber}</td>
-                            <td>{item?.participateInBetaTesting
-}</td>
-                           
-                      
-              
+                            <td>{item.username}</td>
+                            <td>{item.appFeature}</td>
+                            <td>{item.userAction}</td>
+                            <td>{item.status}</td>
+                            <td>{item?.createdAt}</td>
                           </tr>
                         );
                       })}

@@ -353,6 +353,18 @@ function updateRequestTransaction(type, id,reason='') {
     });
 }
 
+
+function getUserLogs() {
+  return fetchWrapper
+    .get(`${baseUrl}/admin/logs`, )
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
 function changePassword(data){
   return fetchWrapper
   .patch(`${baseUrl}/admin/change-password`, data)
@@ -367,12 +379,14 @@ function changePassword(data){
     return error;
   });
 }
+
 export const userService = {
   user: userSubject.asObservable(),
   get userValue() {
     return userSubject.value;
   },
   getUserDayWise,
+  getUserLogs,
   login,
   logout,
   getUsers,
