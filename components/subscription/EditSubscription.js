@@ -102,8 +102,8 @@ export default function EditSubscription(props) {
     } else if (values.packageDesc > 80) {
       errors.packageDesc = "Package Description is maximum 80 characters.";
     }
-
-    if (values.packageDuration != "free-lifetime") {
+    
+    if (values.packageDuration != "trial") {
       if (!values.packageDuration) {
         errors.packageDuration = "Package Duration is required";
       }
@@ -114,13 +114,14 @@ export default function EditSubscription(props) {
         errors.packageAmount =
           "Package Amount must be greater then or equal to 100";
       }
-    } else {
+    }else{
       if (!values.day) {
         errors.day = "Package Day is required";
       }
-      if (values.day < 1) {
-        errors.day = "Package day must be greater then or equal to 1";
+      if(values.day<1){
+        errors.day='Package day must be greater then or equal to 1'
       }
+     
     }
 
     return errors;
@@ -173,16 +174,14 @@ export default function EditSubscription(props) {
                 value={formValues.packageDuration}
                 onChange={handleChange}
               >
-                {formValues.packageDuration == "free-lifetime" && (
+                {formValues.packageDuration == "trial" && (
                   <option
                     value="trial"
                     selected={
-                      formValues.packageDuration == "free-lifetime"
-                        ? true
-                        : false
+                      formValues.packageDuration == "trial" ? true : false
                     }
                   >
-                    Free Lifetime
+                    Free Trial
                   </option>
                 )}
                 <option
@@ -214,7 +213,7 @@ export default function EditSubscription(props) {
                 {formErrors?.packageDuration}
               </div>
             </div>
-            {formValues.packageDuration != "free-lifetime" && (
+            {formValues.packageDuration != "trial" && (
               <div className="form--item">
                 <label className="form--label" htmlFor="lockModel">
                   Package Amount*
@@ -233,27 +232,27 @@ export default function EditSubscription(props) {
                 </div>
               </div>
             )}
-
-            {formValues.packageDuration == "free-lifetime" && (
+            {formValues.packageDuration == "trial" && (
               <div className="form--item">
                 <label className="form--label" htmlFor="lockModel">
-                  Package Amount*
+                  Trial Days*
                 </label>
                 <input
-                  disabled
-                  type="text"
-                  name="packageAmount"
-                  value={0}
+                  type="number"
+                  name="day"
+                  value={formValues.day}
                   className={`form--control ${
-                    formErrors.packageAmount ? "is-invalid" : ""
+                    formErrors.day ? "is-invalid" : ""
                   }`}
+                  min='1'
+                  max='45'
+                  onChange={handleChange}
                 />
                 <div className="invalid-feedback">
-                  {formErrors.packageAmount}
+                  {formErrors.day}
                 </div>
               </div>
             )}
-
             <div className="form--item">
               <label className="form--label" htmlFor="lockModel">
                 Package Description*
