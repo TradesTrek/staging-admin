@@ -110,9 +110,9 @@ export default function EditSubscription(props) {
       if (!values.packageAmount) {
         errors.packageAmount = "Package Amount is required";
       }
-      if (values.packageAmount < 100) {
+      if (values.packageAmount < 1) {
         errors.packageAmount =
-          "Package Amount must be greater then or equal to 100";
+          "Package Amount must be greater than or equal to 1";
       }
     }else{
       if (!values.day) {
