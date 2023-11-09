@@ -498,7 +498,7 @@ export default function CategoryList() {
                           <td onClick={()=>setTableAction(false)}>{item.categoryName}</td>
                           <td onClick={()=>setTableAction(false)}>{item.status?"Enable":"Disable"}</td>
 
-                          <td onClick={()=>setTableAction(false)}><img width={110} src={`${baseUrl}/${item.filePath}`} /> </td>
+                          <td onClick={()=>setTableAction(false)}><img width={110} src={`${item.imageUrl}`} /> </td>
                           <td onClick={()=>setTableAction(false)}>{moment(item.createdAt).format("lll")}</td>
 
                           <td

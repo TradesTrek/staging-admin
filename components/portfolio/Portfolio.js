@@ -113,7 +113,7 @@ const Portfolio = () => {
                 <td>
                   {user?.subscriptionDuration === "free-lifetime"
                     ? "free-lifetime"
-                    : moment(user?.expiredDate).format(
+                    : moment(user?.currentSubscriptionExpiryDate).format(
                         "MMMM Do YYYY, h:mm:ss a"
                       )}
                 </td>
@@ -239,7 +239,7 @@ const Portfolio = () => {
                     <tr>
                       <th>Join Date</th>
                       <th>
-                        {moment(item?.expiredDate).format("MMMM Do YYYY")}
+                        {moment(item?.currentSubscriptionExpiryDate).format("MMMM Do YYYY")}
                       </th>
                     </tr>
                     <tr>

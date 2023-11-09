@@ -104,6 +104,35 @@ export default function AllGames() {
     getAllGame(currentPage, searchgame, {option,fileterOption});
   };
 
+  const resetCompetition  = async (gameId) => {
+    let response = await gameService.resetGame(gameId);
+    if (response.success) {
+      toast.success(response.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      getAllGame(currentPage, searchgame,{option,fileterOption});
+    } else {
+      toast.error(response.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  }
+  const confirmResetCompetition = (gameId) => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to do this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => resetCompetition(gameId),
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
+  }
+
   const confirmDelete = (userId) => {
     confirmAlert({
       title: "Confirm to submit",
@@ -731,6 +760,18 @@ export default function AllGames() {
                                       Edit Competition
                                     </a>
                                   </Link>
+                                  <Link href="javascript:void(0)">
+                                    <a
+                                      className="edit__detail"
+                                      onClick={() => {
+                                        confirmResetCompetition(item._id);
+                                      }}
+                                    >
+                                      Reset competition
+                                    </a>
+                                  </Link>
+
+
                                   {item?.users?.length == 0 &&
                                     item?.creatorType == "Admin" && (
                                       <Link href="javascript:void(0)">

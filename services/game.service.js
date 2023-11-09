@@ -29,6 +29,18 @@ function getAllRefferal(page,search = "",option={}) {
       return error;
     });
 }
+
+function resetGame(gameId) {
+  return fetchWrapper
+    .get(`${baseUrl}/admin/game/reset?gameId=${gameId}`)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
 function deleteGame(gameId) {
   return fetchWrapper
     .delete(`${baseUrl}/admin/game/delete?gameId=${gameId}`)
@@ -317,6 +329,7 @@ export const gameService = {
   createGame,
   updateSubscription,
   deleteGame,
+  resetGame,
   updateGame,
   getRank,
   getWinner,

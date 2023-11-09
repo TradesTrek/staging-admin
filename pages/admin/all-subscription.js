@@ -47,6 +47,10 @@ export default function AllSubscription() {
       key: "packageName",
     },
     { label: "Subscription Duration", key: "packageDuration" },
+    {
+      label: "Category",
+      key: "category",
+    },
     { label: "Package Amount", key: "packageAmount" },
     { label: "Package Day", key: "day" },
     { label: "Package Description", key: "packageDesc" },
@@ -417,6 +421,28 @@ export default function AllSubscription() {
                       >
                         Subscription Duration
                       </th>
+
+                      <th
+                        className={
+                          option.category == 1
+                            ? "desc"
+                            : option.category == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            category:
+                              option.category == 1 ? -1 : 1,
+                          });
+                          setTableAction(false);
+                        }}
+                      >
+                        Subscription Category
+                      </th>
+
+
                       <th
                         className={
                           option.packageAmount == 1
@@ -536,6 +562,9 @@ export default function AllSubscription() {
                             </td>
                             <td onClick={() => setTableAction(false)}>
                               {item.packageDuration}
+                            </td>
+                            <td onClick={() => setTableAction(false)}>
+                              {item.category}
                             </td>
                             <td onClick={() => setTableAction(false)}>
                               {item.packageAmount}

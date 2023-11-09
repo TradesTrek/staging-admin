@@ -354,9 +354,9 @@ function updateRequestTransaction(type, id,reason='') {
 }
 
 
-function getUserLogs() {
+function getUserLogs(search,data,page) {
   return fetchWrapper
-    .get(`${baseUrl}/admin/logs`, )
+    .post(`${baseUrl}/admin/logs?page=${page}&search=${search}`,  data)
     .then((res) => {
       return res;
     })

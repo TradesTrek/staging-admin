@@ -56,7 +56,7 @@ export default function UsersList() {
     { label: "Refferal", key: "yourRefferal" },
     { label: "Joined Refferal", key: "joinedRefferal" },
     { label: "Join Date", key: "createdAt" },
-    { label: "Subscription Expired Date", key: "expiredDate" },
+    { label: "Subscription Expired Date", key: "currentSubscriptionExpiryDate" },
   ];
   useEffect(() => {
     dispatch(getUsers(page, search, option, fileterOption));
