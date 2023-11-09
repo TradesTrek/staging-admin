@@ -92,9 +92,9 @@ export default function AddSubscription({ addUserCloseModal }) {
     if (!values.packageAmount) {
       errors.packageAmount = "Package amount is required";
     }
-    if (values.packageAmount < 100) {
+    if (values.packageAmount < 1) {
       errors.packageAmount =
-        "Package Amount must be greater then or equal to 100";
+        "Package Amount must be greater then or equal to 1";
     }
     if (!values.packageDesc) {
       errors.packageDesc = "Package description is required";
