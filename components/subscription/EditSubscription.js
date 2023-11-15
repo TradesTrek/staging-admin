@@ -102,7 +102,7 @@ export default function EditSubscription(props) {
     } else if (values.packageDesc > 80) {
       errors.packageDesc = "Package Description is maximum 80 characters.";
     }
-    
+
     if (values.packageDuration != "trial") {
       if (!values.packageDuration) {
         errors.packageDuration = "Package Duration is required";
@@ -114,14 +114,13 @@ export default function EditSubscription(props) {
         errors.packageAmount =
           "Package Amount must be greater than or equal to 100";
       }
-    }else{
+    } else {
       if (!values.day) {
         errors.day = "Package Day is required";
       }
-      if(values.day<1){
-        errors.day='Package day must be greater then or equal to 1'
+      if (values.day < 1) {
+        errors.day = "Package day must be greater then or equal to 1";
       }
-     
     }
 
     return errors;
@@ -184,6 +183,20 @@ export default function EditSubscription(props) {
                     Free Trial
                   </option>
                 )}
+
+                {formValues.packageDuration == "free-lifetime" && (
+                  <option
+                    value="free-lifetime"
+                    selected={
+                      formValues.packageDuration == "free-lifetime"
+                        ? true
+                        : false
+                    }
+                  >
+                    Free Trial
+                  </option>
+                )}
+
                 <option
                   value="monthly"
                   selected={
@@ -244,13 +257,11 @@ export default function EditSubscription(props) {
                   className={`form--control ${
                     formErrors.day ? "is-invalid" : ""
                   }`}
-                  min='1'
-                  max='45'
+                  min="1"
+                  max="45"
                   onChange={handleChange}
                 />
-                <div className="invalid-feedback">
-                  {formErrors.day}
-                </div>
+                <div className="invalid-feedback">{formErrors.day}</div>
               </div>
             )}
             <div className="form--item">
