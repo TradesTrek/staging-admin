@@ -226,12 +226,13 @@ export default function EditSubscription(props) {
                 {formErrors?.packageDuration}
               </div>
             </div>
-            {formValues.packageDuration != "trial" || formValues.packageDuration != "free-lifetime" && (
+            { 
               <div className="form--item">
                 <label className="form--label" htmlFor="lockModel">
                   Package Amount*
                 </label>
                 <input
+                  disabled={formValues.packageDuration != "trial" || formValues.packageDuration != "free-lifetime"}
                   type="text"
                   name="packageAmount"
                   value={formValues.packageAmount}
@@ -244,7 +245,7 @@ export default function EditSubscription(props) {
                   {formErrors.packageAmount}
                 </div>
               </div>
-            )}
+            }
             {formValues.packageDuration == "trial" && (
               <div className="form--item">
                 <label className="form--label" htmlFor="lockModel">
