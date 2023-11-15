@@ -226,7 +226,7 @@ export default function EditSubscription(props) {
                 {formErrors?.packageDuration}
               </div>
             </div>
-            {formValues.packageDuration != "trial" && (
+            {formValues.packageDuration != "trial" || formValues.packageDuration != "free-lifetime" && (
               <div className="form--item">
                 <label className="form--label" htmlFor="lockModel">
                   Package Amount*
