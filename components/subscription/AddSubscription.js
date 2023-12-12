@@ -11,11 +11,13 @@ export default function AddSubscription({ addUserCloseModal }) {
   const baseUrl = `${publicRuntimeConfig.apiUrl}`;
   const toastId = useRef(null);
   const intialValues = {
+    isGiftableSubscription: false,
     packageName: "",
     packageDuration: "monthly",
     packageAmount: 0,
     packageDesc: "",
     category: "Premium",
+    amountOfDays: 1,
   };
   const [formValues, setFormValues] = useState(intialValues);
   const [formErrors, setFormErrors] = useState({});
@@ -36,16 +38,10 @@ export default function AddSubscription({ addUserCloseModal }) {
   };
 
   const submitEditForm = async () => {
+  
     setUpdateLoader(true);
-    const data = {
-      packageName: formValues?.packageName,
-      packageDuration: formValues?.packageDuration,
-      packageAmount: formValues?.packageAmount,
-      packageDesc: formValues?.packageDesc,
-      category: formValues?.category
-    };
 
-    const response = await subscriptionService.AddSubscription(data);
+    const response = await subscriptionService.AddSubscription(formValues);
     if (response.success) {
       toast.success(response.message, {
         position: toast.POSITION.TOP_RIGHT,
@@ -67,7 +63,11 @@ export default function AddSubscription({ addUserCloseModal }) {
   // Save value in state
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
+    if (name === "isGiftableSubscription") {
+      setFormValues({ ...formValues, [name]: value, packageAmount: 0 });
+    } else {
+      setFormValues({ ...formValues, [name]: value });
+    }
     setFormErrors(validate(formValues));
     setFormErrors({ ...formErrors, [name]: "" });
   };
@@ -89,13 +89,24 @@ export default function AddSubscription({ addUserCloseModal }) {
     if (!values.category) {
       errors.category = "Package category is required";
     }
-    if (!values.packageAmount) {
-      errors.packageAmount = "Package amount is required";
+
+    if (values.isGiftableSubscription) {
+      if (!values.amountOfDays || values.amountOfDays < 1) {
+        errors.amountOfDays = "minimum of a day is required";
+      }
     }
-    if (values.packageAmount < 100) {
-      errors.packageAmount =
-        "Package Amount must be greater than or equal to 100";
+
+    if (!values.isGiftableSubscription) {
+      if (!values.packageAmount) {
+        errors.packageAmount = "Package amount is required";
+      }
+
+      if (values.packageAmount < 100) {
+        errors.packageAmount =
+          "Package Amount must be greater than or equal to 100";
+      }
     }
+
     if (!values.packageDesc) {
       errors.packageDesc = "Package description is required";
     } else if (values.packageDesc.length > 80) {
@@ -125,6 +136,33 @@ export default function AddSubscription({ addUserCloseModal }) {
         <div className="user--form">
           <form id="addLocks" onSubmit={handleSubmit} noValidate>
             <div className="form--item">
+              <label className="form--label" htmlFor="brand">
+                isGiftableSubscription*
+              </label>
+              <select
+                className={`form--control `}
+                name="isGiftableSubscription"
+                value={formValues.isGiftableSubscription}
+                onChange={handleChange}
+              >
+                <option
+                  value={false}
+                  selected={
+                    formValues.isGiftableSubscription === false ? true : false
+                  }
+                >
+                  False
+                </option>
+                <option
+                  value={true}
+                  selected={formValues.packageDuration == true ? true : false}
+                >
+                  True
+                </option>
+              </select>
+            </div>
+
+            <div className="form--item">
               <label className="form--label" htmlFor="lockModel">
                 Package Name*
               </label>
@@ -151,19 +189,11 @@ export default function AddSubscription({ addUserCloseModal }) {
                 value={formValues.packageDuration}
                 onChange={handleChange}
               >
-                {/* <option
-                  value='trial'
-                  selected={formValues.packageDuration == 'trial' ? true : false}
-                >
-                Free  Trial
-                </option> */}
                 <option
-                  value="hourly"
-                  selected={
-                    formValues.packageDuration == "hourly" ? true : false
-                  }
+                  value="daily"
+                  selected={formValues.packageDuration == "daily" ? true : false}
                 >
-                  Hourly
+                  Daily
                 </option>
                 <option
                   value="monthly"
@@ -203,6 +233,25 @@ export default function AddSubscription({ addUserCloseModal }) {
               </div>
             </div>
 
+            {formValues.packageDuration == "daily" && (
+              <div className="form--item">
+                <label className="form--label" htmlFor="lockModel">
+                  Amount of days*
+                </label>
+                <input
+                  type="text"
+                  name="amountOfDays"
+                  value={formValues.amountOfDays}
+                  className={`form--control`}
+                  onChange={handleChange}
+                />
+
+                <div className="invalid-feedback">
+                  {formErrors?.amountOfDays}
+                </div>
+              </div>
+            )}
+
             <div className="form--item">
               <label className="form--label" htmlFor="brand">
                 Package Category*
@@ -215,10 +264,6 @@ export default function AddSubscription({ addUserCloseModal }) {
                 value={formValues.category}
                 onChange={handleChange}
               >
-
-
-
-
                 <option
                   value="Premium"
                   selected={formValues.category == "Premium" ? true : false}
@@ -238,25 +283,29 @@ export default function AddSubscription({ addUserCloseModal }) {
                   Basic
                 </option>
               </select>
-              <div className="invalid-feedback">
-                {formErrors?.category}
+              <div className="invalid-feedback">{formErrors?.category}</div>
+            </div>
+
+            {!formValues.isGiftableSubscription && (
+              <div className="form--item">
+                <label className="form--label" htmlFor="lockModel">
+                  Package Amount*
+                </label>
+                <input
+                  type="text"
+                  name="packageAmount"
+                  value={formValues.packageAmount}
+                  className={`form--control ${
+                    formErrors.packageAmount ? "is-invalid" : ""
+                  }`}
+                  onChange={handleChange}
+                />
+                <div className="invalid-feedback">
+                  {formErrors.packageAmount}
+                </div>
               </div>
-            </div>
-            <div className="form--item">
-              <label className="form--label" htmlFor="lockModel">
-                Package Amount*
-              </label>
-              <input
-                type="text"
-                name="packageAmount"
-                value={formValues.packageAmount}
-                className={`form--control ${
-                  formErrors.packageAmount ? "is-invalid" : ""
-                }`}
-                onChange={handleChange}
-              />
-              <div className="invalid-feedback">{formErrors.packageAmount}</div>
-            </div>
+            )}
+
             <div className="form--item">
               <label className="form--label" htmlFor="lockModel">
                 Package Description*

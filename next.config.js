@@ -14,13 +14,13 @@ const nextConfig = {
   },
   env: {
     baseApiUrl: process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4000' // development api
+    ? 'http://localhost:5000' // development api
     : 'https://staging-api.tradestrek.com',
   },
   publicRuntimeConfig: {
     apiUrl:
     process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4000' // development api
+    ? 'http://localhost:5000' // development api
     : 'https://staging-api.tradestrek.com', // production api
   },
 };

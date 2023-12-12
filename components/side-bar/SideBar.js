@@ -103,13 +103,6 @@ export default function SideBar() {
                 </li>
 
                 <li className={rout === 'users' ? 'active' : ''}>
-                  <Link href="/admin/all-betausers">
-                    <a>Beta Users</a>
-                  </Link>
-                </li>
-
-
-                <li className={rout === 'users' ? 'active' : ''}>
                   <Link href="/admin/all-userlogs">
                     <a>User Logs</a>
                   </Link>
@@ -189,6 +182,13 @@ export default function SideBar() {
                 <li className={rout === 'users' ? 'active' : ''}>
                   <Link href="/admin/all-subscription">
                     <a>Subscription</a>
+                  </Link>
+                </li>
+
+                
+                <li>
+                  <Link href="/admin/gift-users">
+                    <a>Gift Users</a>
                   </Link>
                 </li>
               </ul>

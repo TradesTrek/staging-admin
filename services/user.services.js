@@ -288,6 +288,19 @@ function getUserDayWise() {
     });
 }
 
+
+function getGiftableSubscription() {
+  return fetchWrapper
+    .get(`${baseUrl}/admin/getGiftedSubscription`)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
 function getAllRequestTransaction(data = {},page,search='') {
   return fetchWrapper
     .post(`${baseUrl}/transaction/admin/all?page=${page}&search=${search}`, data)
@@ -353,10 +366,31 @@ function updateRequestTransaction(type, id,reason='') {
     });
 }
 
+function giftUsers(data) {
+  return fetchWrapper
+    .post(`${baseUrl}/subscription/giftUsers`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
 
 function getUserLogs(search,data,page) {
   return fetchWrapper
     .post(`${baseUrl}/admin/logs?page=${page}&search=${search}`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function getNonPremiumFreetrialUsers(search,data,page) {
+  return fetchWrapper
+    .post(`${baseUrl}/admin/users/nonPremiumFreetrialUsers?page=${page}&search=${search}`,  data)
     .then((res) => {
       return res;
     })
@@ -387,6 +421,7 @@ export const userService = {
   },
   getUserDayWise,
   getUserLogs,
+  giftUsers,
   login,
   logout,
   getUsers,
@@ -412,9 +447,11 @@ export const userService = {
   downloadAllUser,
   getAllStock,
   downloadAllStock,
+  getNonPremiumFreetrialUsers,
   downloadAllTransaction,
   downloadHoliday,
   getAllBank,
   downloadAllBankDetails,
-  changePassword
+  changePassword,
+  getGiftableSubscription
 };
