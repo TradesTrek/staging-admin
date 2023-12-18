@@ -184,11 +184,14 @@ export default function SideBar() {
                     <a>Subscription</a>
                   </Link>
                 </li>
-
-                
                 <li>
                   <Link href="/admin/gift-users">
                     <a>Gift Users</a>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/all-giftedUsers">
+                    <a>View Gifted Users</a>
                   </Link>
                 </li>
               </ul>

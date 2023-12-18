@@ -211,7 +211,7 @@ export default function AllTransaction() {
         <div className="contentWrapper">
           <div className="dashboard_content">
             <h1 className="dashboard__title">
-              Gift non premium free-trial users
+              Gift  users
             </h1>
             <div className="btnLists manager">
               <ul>

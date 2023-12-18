@@ -377,6 +377,17 @@ function giftUsers(data) {
     });
 }
 
+function getGiftedUsers(search,data,page) {
+  return fetchWrapper
+    .post(`${baseUrl}/admin/users/gitedUsers?page=${page}&search=${search}`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
 function getUserLogs(search,data,page) {
   return fetchWrapper
     .post(`${baseUrl}/admin/logs?page=${page}&search=${search}`,  data)
@@ -453,5 +464,6 @@ export const userService = {
   getAllBank,
   downloadAllBankDetails,
   changePassword,
-  getGiftableSubscription
+  getGiftableSubscription,
+  getGiftedUsers
 };
