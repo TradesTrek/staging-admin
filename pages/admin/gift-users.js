@@ -95,8 +95,9 @@ export default function AllTransaction() {
       setIsRefetching(true);
     }
     userService
-      .getNonPremiumFreetrialUsers(search, option, page)
+      .getAllUsersForGifting(search, option, page)
       .then((res) => {
+        console.log(res, '.....')
         if (res.success) {
           setData(res.data?.docs);
           setTotalPage(res.data.pages);
@@ -141,10 +142,14 @@ export default function AllTransaction() {
   const table = useMantineReactTable({
     columns,
     data, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    mantineSearchTextInputProps: {
+      placeholder: 'Search by username or email',
+    },
     enableRowSelection: true,
     enableColumnFilters: false,
     initialState: { showColumnFilters: true },
     enableSorting: false,
+
     getRowId: (row) => row.email,
     onRowSelectionChange: setRowSelection,
     initialState: { showColumnFilters: true },

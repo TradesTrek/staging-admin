@@ -399,9 +399,9 @@ function getUserLogs(search,data,page) {
     });
 }
 
-function getNonPremiumFreetrialUsers(search,data,page) {
+function getAllUsersForGifting(search,data,page) {
   return fetchWrapper
-    .post(`${baseUrl}/admin/users/nonPremiumFreetrialUsers?page=${page}&search=${search}`,  data)
+    .post(`${baseUrl}/admin/users/allUsersForGifting?page=${page}&search=${search}`,  data)
     .then((res) => {
       return res;
     })
@@ -458,7 +458,7 @@ export const userService = {
   downloadAllUser,
   getAllStock,
   downloadAllStock,
-  getNonPremiumFreetrialUsers,
+  getAllUsersForGifting,
   downloadAllTransaction,
   downloadHoliday,
   getAllBank,

@@ -65,7 +65,8 @@ export default function AllTransaction() {
       .getGiftedUsers(search, data, page)
       .then((res) => {
         if (res.success) {
-          setTransactionList(res.data?.docs);
+          console.log(res)
+          setTransactionList(res.data);
 
           setTotalPage(res.data.pages);
         }
@@ -245,14 +246,14 @@ export default function AllTransaction() {
         <DashboardHeader />
         <div className="contentWrapper">
           <div className="dashboard_content">
-            <h1 className="dashboard__title">User Logs</h1>
+            <h1 className="dashboard__title">Gifted Subscriptions</h1>
             <div className="btnLists manager">
               <ul>
                 <li>
                   <form>
                     <input
                       type="text"
-                      placeholder="Search ..."
+                      placeholder="Search by email or username ..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
                   </form>
@@ -410,7 +411,7 @@ export default function AllTransaction() {
                           });
                         }}
                       >
-                        App feature
+                       First Name
                       </th>
                       <th
                         className={
@@ -427,7 +428,7 @@ export default function AllTransaction() {
                           });
                         }}
                       >
-                        User Action
+                        Last Name
                       </th>
                       <th
                         className={
@@ -462,7 +463,26 @@ export default function AllTransaction() {
                           });
                         }}
                       >
-                        Time
+                        Subscription Activation time
+                      </th>
+
+
+                      <th
+                        className={
+                          option.createdAt == 1
+                            ? "desc"
+                            : option.createdAt == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            createdAt: option.createdAt == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Subscription Expiry time
                       </th>
                     </tr>
                   </thead>
@@ -473,11 +493,14 @@ export default function AllTransaction() {
                         return (
                           <tr key={i}>
                             <td>{(currentPage - 1) * 10 + i + 1}</td>
-                            <td>{item.username}</td>
-                            <td>{item.appFeature}</td>
-                            <td>{item.userAction}</td>
+                            <td>{item.user[0].username}</td>
+                            <td>{item.user[0].firstName}</td>
+                            <td>{item.user[0].lastName}</td>
                             <td>{item.status}</td>
-                            <td>{item?.createdAt}</td>
+                            <td>{moment(item?.activationDate).format('YYYY-MM-DD HH:mm:ss')}</td>
+                            <td>{moment(item?.expireDate).format('YYYY-MM-DD HH:mm:ss')}</td>
+                            
+
                           </tr>
                         );
                       })}
