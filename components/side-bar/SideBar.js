@@ -174,11 +174,7 @@ export default function SideBar() {
             </span>{' '}
             {openMenu2 && (
               <ul className="sub__navMenu">
-                {/* <li className={rout === "all-users" ? "active" : ""}>
-                  <Link href="/admin/users">
-                    <a>All Users</a>
-                  </Link>
-                </li> */}
+               
                 <li className={rout === 'users' ? 'active' : ''}>
                   <Link href="/admin/all-subscription">
                     <a>Subscription</a>

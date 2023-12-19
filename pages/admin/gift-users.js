@@ -49,6 +49,7 @@ export default function AllTransaction() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
+  const [isGiftingLoading, setIsGiftingLoading] = useState(false);
 
   const [error, setError] = useState("");
   const [selectSubscriptionId, setSelectedSubscriptionId] = useState("");
@@ -74,18 +75,21 @@ export default function AllTransaction() {
   }, []);
 
   const giftUsers = async () => {
+    setIsGiftingLoading(true);
     const emails = Object.keys(rowSelection);
     const data = { subscriptionId: selectSubscriptionId, emails };
     try {
       const res = await userService.giftUsers(data);
-      setRowSelection({})
-      setSelectedSubscriptionId("")
+      setRowSelection({});
+      setSelectedSubscriptionId("");
       close();
-      if(res.success){
-        toast.success(res.message)
+      if (res.success) {
+        toast.success(res.message);
       }
+      setIsGiftingLoading(false);
     } catch (error) {
-      toast.error('Failed to gift users')
+      setIsGiftingLoading(false);
+      toast.error("Failed to gift users");
     }
   };
   const getLogs = (search, option, page) => {
@@ -97,13 +101,11 @@ export default function AllTransaction() {
     userService
       .getAllUsersForGifting(search, option, page)
       .then((res) => {
-        console.log(res, '.....')
         if (res.success) {
           setData(res.data?.docs);
           setTotalPage(res.data.pages);
           setRowCount(res.data?.docs.length);
         }
-
         setIsLoading(false);
         setIsRefetching(false);
       })
@@ -143,7 +145,7 @@ export default function AllTransaction() {
     columns,
     data, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
     mantineSearchTextInputProps: {
-      placeholder: 'Search by username or email',
+      placeholder: "Search by username or email",
     },
     enableRowSelection: true,
     enableColumnFilters: false,
@@ -203,11 +205,11 @@ export default function AllTransaction() {
         <Button
           className="m-4"
           variant="filled"
-          disabled={selectSubscriptionId ? false : true}
+          disabled={isGiftingLoading || !selectSubscriptionId}
           style={{ background: "indigo", margin: "10px", float: "right" }}
           onClick={giftUsers}
         >
-          Gift selected users
+          {isGiftingLoading ? "Loading" : "Gift selected users"}
         </Button>
       </Modal>
 
@@ -215,9 +217,7 @@ export default function AllTransaction() {
         <DashboardHeader />
         <div className="contentWrapper">
           <div className="dashboard_content">
-            <h1 className="dashboard__title">
-              Gift  users
-            </h1>
+            <h1 className="dashboard__title">Gift users</h1>
             <div className="btnLists manager">
               <ul>
                 <li>
