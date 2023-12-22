@@ -490,6 +490,7 @@ export default function AllTransaction() {
                     {transactionList &&
                       transactionList.length > 0 &&
                       transactionList.map((item, i) => {
+                        console.log(item)
                         return (
                           <tr key={i}>
                             <td>{(currentPage - 1) * 10 + i + 1}</td>
