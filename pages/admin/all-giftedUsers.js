@@ -493,9 +493,9 @@ export default function AllTransaction() {
                         return (
                           <tr key={i}>
                             <td>{(currentPage - 1) * 10 + i + 1}</td>
-                            <td>{item.user[0].username}</td>
-                            <td>{item.user[0].firstName}</td>
-                            <td>{item.user[0].lastName}</td>
+                            <td>{item.username}</td>
+                            <td>{item.firstName}</td>
+                            <td>{item.lastName}</td>
                             <td>{item.status}</td>
                             <td>{moment(item?.activationDate).format('YYYY-MM-DD HH:mm:ss')}</td>
                             <td>{moment(item?.expireDate).format('YYYY-MM-DD HH:mm:ss')}</td>
