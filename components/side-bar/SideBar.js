@@ -190,6 +190,20 @@ export default function SideBar() {
                     <a>View Gifted Users</a>
                   </Link>
                 </li>
+
+                <li>
+                  <Link href="/admin/discount-code">
+                    <a>Create Discount Code</a>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link href="/admin/discount-subscription">
+                    <a>Apply Discount </a>
+                  </Link>
+                </li>
+
+                
               </ul>
             )}
           </li>{' '}

@@ -9,6 +9,43 @@ const userSubject = new BehaviorSubject(
   process.browser && localStorage.getItem("token")
 );
 
+
+function createDiscountCode(data) {
+  return fetchWrapper
+    .post(`${baseUrl}/discount`, data)
+    .then((res) => {
+      if(res.message=='Authorization Failed'){
+        localStorage.removeItem("token");
+        userSubject.next(null);
+        Router.push("/");
+      }else{
+        return res;
+      }
+     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function applyDiscountToSubscription(data) {
+  return fetchWrapper
+    .post(`${baseUrl}/discount/subscription`, data)
+    .then((res) => {
+      if(res.message=='Authorization Failed'){
+        localStorage.removeItem("token");
+        userSubject.next(null);
+        Router.push("/");
+      }else{
+        return res;
+      }
+     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
 function AddSubscription(data) {
   return fetchWrapper
     .post(`${baseUrl}/subscription/createSubscription`, data)
@@ -26,6 +63,7 @@ function AddSubscription(data) {
       return error;
     });
 }
+
 function unableDisableSub(id) {
   return fetchWrapper
     .put(`${baseUrl}/subscription/enable-disable-subscription?subId=${id}`)
@@ -47,6 +85,20 @@ function getAllSubscription(data,page,search) {
       return error;
     });
 }
+
+ function getAllDiscountCode(data,page,search) {
+  return fetchWrapper
+    .post(`${baseUrl}/discount/all?search=${search}&page=${page}`,data)
+    .then((res) => {
+     return res
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
+
 function downloadSubscription(search,data) {
   return fetchWrapper
     .post(`${baseUrl}/subscription/all-download?search=${search}`,data)
@@ -86,7 +138,10 @@ export const subscriptionService = {
   },
   AddSubscription,
   getAllSubscription,
+  applyDiscountToSubscription,
+  getAllDiscountCode,
   updateSubscription,
   downloadSubscription,
-  unableDisableSub
+  unableDisableSub,
+  createDiscountCode
 };

@@ -410,6 +410,18 @@ function getAllUsersForGifting(search,data,page) {
     });
 }
 
+function getAllPaidSubscriptions(search,data,page) {
+  return fetchWrapper
+    .post(`${baseUrl}/subscription/all-paid?page=${page}&search=${search}`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
 function changePassword(data){
   return fetchWrapper
   .patch(`${baseUrl}/admin/change-password`, data)
@@ -459,6 +471,7 @@ export const userService = {
   getAllStock,
   downloadAllStock,
   getAllUsersForGifting,
+  getAllPaidSubscriptions,
   downloadAllTransaction,
   downloadHoliday,
   getAllBank,
