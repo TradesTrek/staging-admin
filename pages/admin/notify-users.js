@@ -197,7 +197,7 @@ export default function AllTransaction() {
           style={{ background: "indigo", margin: "10px", float: "right" }}
           onClick={giftUsers}
         >
-          {isGiftingLoading ? "Loading" : "Gift selected users"}
+          {isGiftingLoading ? "Loading" : "Send message"}
         </Button>
       </Modal>
 
