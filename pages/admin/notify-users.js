@@ -183,7 +183,7 @@ export default function AllTransaction() {
           setSelectedSubscriptionId("");
           close();
         }}
-        title="Subscriptions"
+        title="Message"
       >
         <Stack>
           <Input

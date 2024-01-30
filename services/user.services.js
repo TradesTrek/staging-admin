@@ -381,7 +381,7 @@ function giftUsers(data) {
 
 function notifyUsers(data) {
   return fetchWrapper
-    .post(`${baseUrl}/subscription/giftUsers`,  data)
+    .post(`${baseUrl}/admin/notify`,  data)
     .then((res) => {
       return res;
     })
