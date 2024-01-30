@@ -70,13 +70,14 @@ export default function AllTransaction() {
     const data = { title, message, emails };
     try {
       const res = await userService.notifyUsers(data);
-      setRowSelection({});
-      handleTitleChange("")
-       handleMessageChange("");
-      close();
-      if (res.success) {
-        toast.success(res.message);
-      }
+      console.log(res)
+      // setRowSelection({});
+      // handleTitleChange("")
+      //  handleMessageChange("");
+      // close();
+      // if (res.success) {
+      //   toast.success(res.message);
+      // }
       setIsMessagingLoading(false);
     } catch (error) {
       console.log(error);
