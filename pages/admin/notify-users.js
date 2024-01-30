@@ -74,10 +74,10 @@ export default function AllTransaction() {
       // setRowSelection({});
       // handleTitleChange("")
       //  handleMessageChange("");
-      // close();
-      // if (res.success) {
-      //   toast.success(res.message);
-      // }
+      close();
+      if (res.success) {
+        toast.success(res.message);
+      }
       setIsMessagingLoading(false);
     } catch (error) {
       console.log(error);
