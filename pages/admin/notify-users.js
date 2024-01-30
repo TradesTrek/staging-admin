@@ -70,10 +70,11 @@ export default function AllTransaction() {
     const data = { title, message, emails };
     try {
       const res = await userService.notifyUsers(data);
-      console.log(res)
-      // setRowSelection({});
-      // handleTitleChange("")
-      //  handleMessageChange("");
+   
+      setRowSelection({});
+      setMessage("");
+      setTitle("");
+
       close();
       if (res.success) {
         toast.success(res.message);
