@@ -79,6 +79,7 @@ export default function AllTransaction() {
       }
       setIsMessagingLoading(false);
     } catch (error) {
+      console.log(error);
       setIsMessagingLoading(false);
       toast.error("Failed to message selected users");
     }
