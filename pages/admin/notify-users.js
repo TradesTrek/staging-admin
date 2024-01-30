@@ -4,7 +4,7 @@ import { Checkbox, Stack } from "@mantine/core";
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 import { useDisclosure } from "@mantine/hooks";
-import { Modal, Button,  Input } from "@mantine/core";
+import { Modal, Button, Input } from "@mantine/core";
 
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
@@ -34,8 +34,6 @@ export default function AllTransaction() {
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const [subscriptionData, setSubscriptionData] = useState([]);
-
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 1,
@@ -49,13 +47,16 @@ export default function AllTransaction() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
-  const [isGiftingLoading, setIsGiftingLoading] = useState(false);
+  const [isMessagingLoading, setIsMessagingLoading] = useState(false);
 
   const [error, setError] = useState("");
+
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
   const [selectSubscriptionId, setSelectedSubscriptionId] = useState("");
 
   useEffect(() => {
-    getLogs(!globalFilter ? "" : globalFilter, option, currentPage);
+    getUsers(!globalFilter ? "" : globalFilter, option, currentPage);
   }, [
     globalFilter,
     option,
@@ -63,36 +64,26 @@ export default function AllTransaction() {
     pagination.pageSize, //refetch when page size changes
   ]);
 
-  useEffect(() => {
-    userService
-      .getGiftableSubscription()
-      .then((res) => {
-        if (res.success) {
-          setSubscriptionData(res.data);
-        }
-      })
-      .catch((err) => {});
-  }, []);
-
-  const giftUsers = async () => {
-    setIsGiftingLoading(true);
+  const messageUsers = async () => {
+    setIsMessagingLoading(true);
     const emails = Object.keys(rowSelection);
-    const data = { subscriptionId: selectSubscriptionId, emails };
+    const data = { title, message, emails };
     try {
-      const res = await userService.giftUsers(data);
+      const res = await userService.notifyUsers(data);
       setRowSelection({});
-      setSelectedSubscriptionId("");
+      handleTitleChange("")
+       handleMessageChange("");
       close();
       if (res.success) {
         toast.success(res.message);
       }
-      setIsGiftingLoading(false);
+      setIsMessagingLoading(false);
     } catch (error) {
-      setIsGiftingLoading(false);
-      toast.error("Failed to gift users");
+      setIsMessagingLoading(false);
+      toast.error("Failed to message selected users");
     }
   };
-  const getLogs = (search, option, page) => {
+  const getUsers = (search, option, page) => {
     if (!data.length) {
       setIsLoading(true);
     } else {
@@ -117,7 +108,7 @@ export default function AllTransaction() {
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected + 1);
-    getLogs(!globalFilter ? "" : globalFilter, option, selected + 1);
+    getUsers(!globalFilter ? "" : globalFilter, option, selected + 1);
   };
 
   const columns = useMemo(
@@ -169,6 +160,14 @@ export default function AllTransaction() {
     },
   });
 
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+
+  const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
+
   return (
     <>
       <Head>
@@ -187,17 +186,28 @@ export default function AllTransaction() {
         title="Subscriptions"
       >
         <Stack>
-        <Input placeholder="Title" />
-        <Input placeholder="Message" />
+          <Input
+            placeholder="Title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+
+          <Input
+            placeholder="Message"
+            value={message}
+            onChange={handleMessageChange}
+          />
         </Stack>
         <Button
           className="m-4"
           variant="filled"
-          disabled={isGiftingLoading || !selectSubscriptionId}
+          disabled={
+            isMessagingLoading || title.trim() === "" || message.trim() === ""
+          }
           style={{ background: "indigo", margin: "10px", float: "right" }}
-          onClick={giftUsers}
+          onClick={messageUsers}
         >
-          {isGiftingLoading ? "Loading" : "Send message"}
+          {isMessagingLoading ? "Loading" : "Send message"}
         </Button>
       </Modal>
 

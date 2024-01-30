@@ -368,6 +368,19 @@ function updateRequestTransaction(type, id,reason='') {
 
 function giftUsers(data) {
   return fetchWrapper
+    .post(`${baseUrl}/admin/notify`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
+
+function notifyUsers(data) {
+  return fetchWrapper
     .post(`${baseUrl}/subscription/giftUsers`,  data)
     .then((res) => {
       return res;
@@ -445,6 +458,7 @@ export const userService = {
   getUserDayWise,
   getUserLogs,
   giftUsers,
+  notifyUsers,
   login,
   logout,
   getUsers,
