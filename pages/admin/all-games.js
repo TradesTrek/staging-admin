@@ -4,6 +4,9 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 
+import { Modal, Button, Input,  Stack } from "@mantine/core";
+
+
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
 import { confirmAlert } from "react-confirm-alert";
@@ -21,11 +24,14 @@ import FormSpinner from "../../components/Spinners/FormSpinner";
 import { CSVLink } from "react-csv";
 import ExportExcel from "../../helpers/ExportExcel";
 import ExportPdf from "../../helpers/ExportPdf";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function AllGames() {
   useEffect(() => {
     document.body.classList.remove("has--tabs");
   });
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   const [tableAction, setTableAction] = useState(false);
   const [filterAction, setFilterAction] = useState(false);
@@ -52,6 +58,12 @@ export default function AllGames() {
   const [pdfDownloading,setPdfDownloading]=useState(false)
   const allCompetitionRef = useRef();
   const [downloadCompetitionData,setDownloadCompetitionData]=useState([])
+
+ const [selectedCompetition, setSelectedCompetiton] = useState(null);
+  const [isMessagingLoading, setIsMessagingLoading] = useState(false);
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+
   const competitionHeaders = [
     {
       label: "Competition Name",
@@ -250,6 +262,35 @@ export default function AllGames() {
 
     }
   };
+
+  const messageUsers = async () => {
+    setIsMessagingLoading(true);
+    const data = { title, message, competitionId: selectedCompetition };
+    try {
+      const res = await userService.notifyUsersInCompetition(data);
+      
+      setMessage("");
+      setTitle("");
+      setSelectedCompetiton(null);
+      close();
+      if (res.success) {
+        toast.success(res.message);
+      }
+      setIsMessagingLoading(false);
+    } catch (error) {
+      setIsMessagingLoading(false);
+      toast.error(e.message);
+    }
+  };
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+
+  const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
+
   return (
     <>
       <Head>
@@ -258,6 +299,41 @@ export default function AllGames() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <SideBar />
+
+      <Modal
+        opened={opened}
+        onClose={() => {
+          setSelectedSubscriptionId("");
+          close();
+        }}
+        title="Message"
+      >
+        <Stack>
+          <Input
+            placeholder="Title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+
+          <Input
+            placeholder="Message"
+            value={message}
+            onChange={handleMessageChange}
+          />
+        </Stack>
+        <Button
+          className="m-4"
+          variant="filled"
+          disabled={
+            isMessagingLoading || title.trim() === "" || message.trim() === ""
+          }
+          style={{ background: "indigo", margin: "10px", float: "right" }}
+          onClick={messageUsers}
+        >
+          {isMessagingLoading ? "Loading" : "Send message"}
+        </Button>
+      </Modal>
+
       <div className="dashboard sideBarOpen">
         <DashboardHeader />
         <div className="contentWrapper">
@@ -820,6 +896,17 @@ export default function AllGames() {
                                       }}
                                     >
                                       View Rank
+                                    </a>
+                                  </Link>
+                                  <Link href="javascript:void(0)">
+                                    <a
+                                      className="view__lock"
+                                      onClick={() => {
+                                         setSelectedCompetiton(item._id)
+                                         open()
+                                      }}
+                                    >
+                                      Notify users
                                     </a>
                                   </Link>
                                   {item?.timePriod && (

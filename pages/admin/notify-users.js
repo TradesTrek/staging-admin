@@ -1,10 +1,9 @@
 import Head from "next/head";
-import { Checkbox, Stack } from "@mantine/core";
 
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 import { useDisclosure } from "@mantine/hooks";
-import { Modal, Button, Input } from "@mantine/core";
+import { Modal, Button, Input,  Stack } from "@mantine/core";
 
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";

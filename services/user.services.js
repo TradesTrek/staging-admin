@@ -377,7 +377,17 @@ function giftUsers(data) {
     });
 }
 
+function notifyUsersInCompetition(data) {
+  return fetchWrapper
+    .post(`${baseUrl}/admin/notifyUsersInCompetition`,  data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
 
+  }
 
 function notifyUsers(data) {
   return fetchWrapper
@@ -459,6 +469,7 @@ export const userService = {
   getUserLogs,
   giftUsers,
   notifyUsers,
+  notifyUsersInCompetition,
   login,
   logout,
   getUsers,
