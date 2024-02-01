@@ -900,7 +900,7 @@ export default function AllGames() {
                                   </Link>
                                   <Link href="javascript:void(0)">
                                     <a
-                                      className="view__lock"
+                                      className=""
                                       onClick={() => {
                                          setSelectedCompetiton(item._id)
                                          open()
