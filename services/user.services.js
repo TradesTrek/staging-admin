@@ -368,7 +368,7 @@ function updateRequestTransaction(type, id,reason='') {
 
 function giftUsers(data) {
   return fetchWrapper
-    .post(`${baseUrl}/admin/notify`,  data)
+    .post(`${baseUrl}/subscription/giftUsers`,  data)
     .then((res) => {
       return res;
     })
