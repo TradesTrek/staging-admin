@@ -82,6 +82,25 @@ function updateSubscription(data) {
       return error;
     });
 }
+
+
+function updateGamePoints(data) {
+  return fetchWrapper
+  .put(`${baseUrl}/admin/game/updateGamePoints`, data)
+
+  .then((res) => {
+    if (res.success) {
+    }
+    return res;
+  })
+  .catch((error) => {
+    if (error?.length > 0) {
+      return error[0];
+    }
+    return error;
+  });
+}
+
 function updateGame(data,gameId) {
   data.dateRange = `${data.startDate} ${data.endDate}`;
   data.startingCash = Number(data.startingCash);
@@ -331,6 +350,7 @@ export const gameService = {
   deleteGame,
   resetGame,
   updateGame,
+  updateGamePoints,
   getRank,
   getWinner,
   getSingleGame,

@@ -4,8 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 
-import { Modal, Button, Input,  Stack } from "@mantine/core";
-
+import { Modal, Button, Input, Stack } from "@mantine/core";
 
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
@@ -26,12 +25,21 @@ import ExportExcel from "../../helpers/ExportExcel";
 import ExportPdf from "../../helpers/ExportPdf";
 import { useDisclosure } from "@mantine/hooks";
 
+const initialPointsData = {
+  accountValuePointPerZeroOnePercent: 1,
+  soldStockPoint: 1,
+  uniqueStockPurchasePoint: 2,
+  gameId: ''
+}
+
 export default function AllGames() {
   useEffect(() => {
     document.body.classList.remove("has--tabs");
   });
 
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [openedPointsModal, pointHandlers] = useDisclosure(false);
 
   const [tableAction, setTableAction] = useState(false);
   const [filterAction, setFilterAction] = useState(false);
@@ -53,14 +61,17 @@ export default function AllGames() {
   const [gameCreatorType, setGameCreatorType] = useState("All");
   const [gameType, setGameType] = useState("All");
   const history = useRouter();
-  const [csvDownloading,setCsvDownloading]=useState(false)
-  const [xlsxDownloading,setXlsxDownloading]=useState(false)
-  const [pdfDownloading,setPdfDownloading]=useState(false)
+  const [csvDownloading, setCsvDownloading] = useState(false);
+  const [xlsxDownloading, setXlsxDownloading] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
   const allCompetitionRef = useRef();
-  const [downloadCompetitionData,setDownloadCompetitionData]=useState([])
+  const [downloadCompetitionData, setDownloadCompetitionData] = useState([]);
 
- const [selectedCompetition, setSelectedCompetiton] = useState(null);
+  const [selectedCompetition, setSelectedCompetiton] = useState(null);
   const [isMessagingLoading, setIsMessagingLoading] = useState(false);
+  const [updatePointsLoading, setUpdatePointsLoading] = useState(false);
+
+  const [userPointsData, setUserPointsData] = useState(initialPointsData);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
@@ -75,11 +86,17 @@ export default function AllGames() {
     { label: "No Of Players", key: "userCount" },
     { label: "Creator", key: "username" },
     { label: "Created Date", key: "createdAt" },
-   
   ];
   useEffect(() => {
-    getAllGame(currentPage, searchgame, {option,fileterOption});
-  }, [currentPage, addUserForm, editUserForm, searchgame, option,fileterOption]);
+    getAllGame(currentPage, searchgame, { option, fileterOption });
+  }, [
+    currentPage,
+    addUserForm,
+    editUserForm,
+    searchgame,
+    option,
+    fileterOption,
+  ]);
   const getAllGame = (page, search, body) => {
     setIsLoading(true);
     gameService
@@ -99,36 +116,36 @@ export default function AllGames() {
 
   const addUserCloseModal = () => {
     setAddUserForm(false);
-    setTableAction(false)
-    getAllGame(currentPage, searchgame,{option,fileterOption});
+    setTableAction(false);
+    getAllGame(currentPage, searchgame, { option, fileterOption });
   };
 
   const addPriodicCloseModal = () => {
     setAddPriodicForm(false);
-    getAllGame(currentPage, searchgame, {option,fileterOption});
+    getAllGame(currentPage, searchgame, { option, fileterOption });
   };
 
   const editUserCloseModal = () => {
     setEditUserForm(false);
-    setTableAction(false)
+    setTableAction(false);
 
     setUserData("");
-    getAllGame(currentPage, searchgame, {option,fileterOption});
+    getAllGame(currentPage, searchgame, { option, fileterOption });
   };
 
-  const resetCompetition  = async (gameId) => {
+  const resetCompetition = async (gameId) => {
     let response = await gameService.resetGame(gameId);
     if (response.success) {
       toast.success(response.message, {
         position: toast.POSITION.TOP_RIGHT,
       });
-      getAllGame(currentPage, searchgame,{option,fileterOption});
+      getAllGame(currentPage, searchgame, { option, fileterOption });
     } else {
       toast.error(response.message, {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-  }
+  };
   const confirmResetCompetition = (gameId) => {
     confirmAlert({
       title: "Confirm to submit",
@@ -143,7 +160,7 @@ export default function AllGames() {
         },
       ],
     });
-  }
+  };
 
   const confirmDelete = (userId) => {
     confirmAlert({
@@ -185,7 +202,7 @@ export default function AllGames() {
       //     position: toast.POSITION.TOP_RIGHT,
       //   });
       // }
-      getAllGame(currentPage, searchgame, {option,fileterOption});
+      getAllGame(currentPage, searchgame, { option, fileterOption });
     } else {
       toast.error(response.message, {
         position: toast.POSITION.TOP_RIGHT,
@@ -200,7 +217,7 @@ export default function AllGames() {
       //     position: toast.POSITION.TOP_RIGHT,
       //   });
       // }
-      getAllGame(currentPage, searchgame,{option,fileterOption});
+      getAllGame(currentPage, searchgame, { option, fileterOption });
     } else {
       toast.error(response.message, {
         position: toast.POSITION.TOP_RIGHT,
@@ -224,7 +241,7 @@ export default function AllGames() {
     setCurrentPage(selected + 1);
   };
   const handleFilterSubmit = () => {
-    setCurrentPage(1)
+    setCurrentPage(1);
     let tempdata = {};
     if (gameStatus == "All") {
     } else {
@@ -232,21 +249,21 @@ export default function AllGames() {
     }
     if (gameType == "All") {
     } else {
-      tempdata.competitionType = gameType
+      tempdata.competitionType = gameType;
     }
     if (gameCreatorType == "All") {
     } else {
-      tempdata.creatorType = gameCreatorType
+      tempdata.creatorType = gameCreatorType;
     }
-  
-    
+
     setFilterOption(tempdata);
     setFilterAction(false);
-   
   };
   const downloadCompetition = async (str) => {
-   
-    const { data } = await gameService.downloadAllCompetition(searchgame,{option,fileterOption});
+    const { data } = await gameService.downloadAllCompetition(searchgame, {
+      option,
+      fileterOption,
+    });
     setDownloadCompetitionData(data);
     if (str == "csv") {
       setTimeout(() => {
@@ -255,11 +272,10 @@ export default function AllGames() {
       }, 1000);
     } else if (str == "xlsx") {
       ExportExcel(competitionHeaders, data, "competition");
-      setXlsxDownloading(false)
+      setXlsxDownloading(false);
     } else if (str == "pdf") {
       ExportPdf(competitionHeaders, data, "competition");
-      setPdfDownloading(false)
-
+      setPdfDownloading(false);
     }
   };
 
@@ -268,7 +284,7 @@ export default function AllGames() {
     const data = { title, message, competitionId: selectedCompetition };
     try {
       const res = await userService.notifyUsersInCompetition(data);
-      
+
       setMessage("");
       setTitle("");
       setSelectedCompetiton(null);
@@ -291,6 +307,76 @@ export default function AllGames() {
     setMessage(event.target.value);
   };
 
+  const updatePoints = async () => {
+    try {
+      const {
+        accountValuePointPerZeroOnePercent,
+        soldStockPoint,
+        uniqueStockPurchasePoint,
+        gameId
+      } = userPointsData;
+
+      if (
+        isNaN(accountValuePointPerZeroOnePercent) ||
+        isNaN(soldStockPoint) ||
+        isNaN(uniqueStockPurchasePoint) || !gameId
+      ) {
+        toast.error("Ensure all field are correct before sumbission");
+        return;
+      }
+
+      setUpdatePointsLoading(true)
+      const response=  await gameService.updateGamePoints(userPointsData)
+      if (response.success) {
+        toast.success(response.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setUpdatePointsLoading(false);
+        pointHandlers.close()
+
+        const gameIndex = games.findIndex((game) => game._id === gameId);
+        if (gameIndex !== -1) {
+    
+          const updatedGame = {
+            ...games[gameIndex],
+            accountValuePointPerZeroOnePercent,
+            soldStockPoint,
+            uniqueStockPurchasePoint,
+          };
+  
+          // Create a new array with the updated game
+          const updatedGamesArray = [...games];
+          updatedGamesArray[gameIndex] = updatedGame;
+  
+          // Update the games state with the new array
+          setGames(updatedGamesArray);
+        }
+      
+        
+      } else {
+        setUpdatePointsLoading(false);
+        toast.error(response.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        })
+      }
+    } catch (error) {
+      setUpdatePointsLoading(false);
+      toast.error(error.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      })
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    // Validate input to ensure it's a number
+    const numericValue = parseFloat(value.replace(/[^0-9.]/g, "")); // Allow decimals
+
+    setUserPointsData({
+      ...userPointsData,
+      [field]: isNaN(numericValue) ? "" : numericValue, // Set to '' if not a number
+    });
+  };
+
   return (
     <>
       <Head>
@@ -303,7 +389,7 @@ export default function AllGames() {
       <Modal
         opened={opened}
         onClose={() => {
-          setSelectedSubscriptionId("");
+          setSelectedCompetiton(null);
           close();
         }}
         title="Message"
@@ -334,6 +420,70 @@ export default function AllGames() {
         </Button>
       </Modal>
 
+      <Modal
+        opened={openedPointsModal}
+        onClose={() => {
+          setUserPointsData(initialPointsData);
+          pointHandlers.close();
+        }}
+        title="Update Points"
+      >
+        <Stack>
+          <Input.Wrapper label="Account Value Point per 0.01%">
+            <Input
+              placeholder="Account Value Point per 0.01%"
+              value={userPointsData.accountValuePointPerZeroOnePercent}
+              onChange={(event) =>
+                handleInputChange(
+                  "accountValuePointPerZeroOnePercent",
+                  event.target.value
+                )
+              }
+              inputMode="numeric" // Use inputMode for mobile keyboard behavior
+            />
+          </Input.Wrapper>
+
+          <Input.Wrapper label="Sold Stock Point">
+            <Input
+              placeholder="Sold Stock Point"
+              value={userPointsData.soldStockPoint}
+              onChange={(event) =>
+                handleInputChange("soldStockPoint", event.target.value)
+              }
+              inputMode="numeric"
+            />
+          </Input.Wrapper>
+
+          <Input.Wrapper label="Unique Stock Purchase Point">
+            <Input
+              placeholder="Unique Stock Purchase Point"
+              value={userPointsData.uniqueStockPurchasePoint}
+              onChange={(event) =>
+                handleInputChange(
+                  "uniqueStockPurchasePoint",
+                  event.target.value
+                )
+              }
+              inputMode="numeric"
+            />
+          </Input.Wrapper>
+        </Stack>
+        <Button
+          className="m-4"
+          variant="filled"
+          disabled={
+            updatePointsLoading ||
+            isNaN(userPointsData.accountValuePointPerZeroOnePercent) ||
+            isNaN(userPointsData.soldStockPoint) ||
+            isNaN(userPointsData.uniqueStockPurchasePoint)
+          }
+          style={{ background: "indigo", margin: "10px", float: "right" }}
+          onClick={updatePoints}
+        >
+          {updatePointsLoading ? "Loading" : "Update Points"}
+        </Button>
+      </Modal>
+
       <div className="dashboard sideBarOpen">
         <DashboardHeader />
         <div className="contentWrapper">
@@ -357,69 +507,77 @@ export default function AllGames() {
                   </form>
                 </li>
                 <li>
-            {csvDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setCsvDownloading(true)
-                  downloadCompetition("csv")}}>
-                  Export as CSV
-                </a>
-              </Link>
-            )}
-               <CSVLink
-              style={{ display: "none" }}
-              ref={allCompetitionRef}
-              headers={competitionHeaders}
-              data={downloadCompetitionData}
-            >
-              Download me
-            </CSVLink>
-          </li>
-          <li>
-            {xlsxDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setXlsxDownloading(true)
-                  downloadCompetition("xlsx")
-                }}>
-                  Export as xlsx
-                </a>
-              </Link>
-            )}
-
-         
-          </li>
-          <li>
-            {" "}
-            {pdfDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setPdfDownloading(true)
-                  downloadCompetition("pdf")
-                }}>
-                  Export as PDF
-                </a>
-              </Link>
-            )}
-          </li>
+                  {csvDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setCsvDownloading(true);
+                          downloadCompetition("csv");
+                        }}
+                      >
+                        Export as CSV
+                      </a>
+                    </Link>
+                  )}
+                  <CSVLink
+                    style={{ display: "none" }}
+                    ref={allCompetitionRef}
+                    headers={competitionHeaders}
+                    data={downloadCompetitionData}
+                  >
+                    Download me
+                  </CSVLink>
+                </li>
+                <li>
+                  {xlsxDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setXlsxDownloading(true);
+                          downloadCompetition("xlsx");
+                        }}
+                      >
+                        Export as xlsx
+                      </a>
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  {" "}
+                  {pdfDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setPdfDownloading(true);
+                          downloadCompetition("pdf");
+                        }}
+                      >
+                        Export as PDF
+                      </a>
+                    </Link>
+                  )}
+                </li>
                 <div className=" addButton1">
                   <span
                     className="filter--options"
@@ -483,12 +641,14 @@ export default function AllGames() {
                   >
                     <option value="All">All</option>
 
-                    <option value='Public'>Public</option>
-                    <option value='Private'>Private</option>
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
                   </select>
                 </div>
                 <div className="form--item">
-                  <label className="form--label">Competition Creator Type</label>
+                  <label className="form--label">
+                    Competition Creator Type
+                  </label>
                   <select
                     className="form--control"
                     value={gameCreatorType}
@@ -496,8 +656,8 @@ export default function AllGames() {
                   >
                     <option value="All">All</option>
 
-                    <option value='User'>User</option>
-                    <option value='Admin'>Admin</option>
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
                   </select>
                 </div>
                 <div onClick={handleFilterSubmit}>
@@ -667,7 +827,8 @@ export default function AllGames() {
                       >
                         Entry Amount
                       </th>
-                      <th  className={
+                      <th
+                        className={
                           option.userCount == 1
                             ? "desc"
                             : option.userCount == -1
@@ -679,7 +840,8 @@ export default function AllGames() {
                           setOption({
                             userCount: option.userCount == 1 ? -1 : 1,
                           });
-                        }}>
+                        }}
+                      >
                         No of Players
                       </th>
                       <th
@@ -817,10 +979,9 @@ export default function AllGames() {
                                   }}
                                 ></span>
                               </span>
-                              
                             </td>
-                          <div className="actionData">
-                          {tableAction && isUserToggle === item._id ? (
+                            <div className="actionData">
+                              {tableAction && isUserToggle === item._id ? (
                                 <span
                                   className="tableActions"
                                   key={isUserToggle}
@@ -846,7 +1007,6 @@ export default function AllGames() {
                                       Reset competition
                                     </a>
                                   </Link>
-
 
                                   {item?.users?.length == 0 &&
                                     item?.creatorType == "Admin" && (
@@ -902,11 +1062,38 @@ export default function AllGames() {
                                     <a
                                       className=""
                                       onClick={() => {
-                                         setSelectedCompetiton(item._id)
-                                         open()
+                                        setSelectedCompetiton(item._id);
+                                        open();
                                       }}
                                     >
                                       Notify users
+                                    </a>
+                                  </Link>
+                                  <Link href="javascript:void(0)">
+                                    <a
+                                      className="edit__detail"
+                                      onClick={() => {
+                                        console.log(item)
+                                        setUserData(item);
+                                        const {
+                                          soldStockPoint,
+                                          uniqueStockPurchasePoint,
+                                          accountValuePointPerZeroOnePercent,
+                                          _id
+
+                                        } = item;
+
+                                        setUserPointsData({
+                                          soldStockPoint,
+                                          uniqueStockPurchasePoint,
+                                          accountValuePointPerZeroOnePercent,
+                                          gameId: _id
+
+                                        });
+                                        pointHandlers.open();
+                                      }}
+                                    >
+                                      Edit Ranking points
                                     </a>
                                   </Link>
                                   {item?.timePriod && (
@@ -938,15 +1125,13 @@ export default function AllGames() {
                 breakLabel={"..."}
                 breakClassName={"break-me"}
                 pageCount={allPage}
-                forcePage={currentPage-1}
+                forcePage={currentPage - 1}
                 marginPagesDisplayed={2}
                 pageRangeDisplayed={5}
                 onPageChange={handlePageClick}
                 containerClassName={"pagination"}
                 subContainerClassName={"pages pagination"}
                 activeClassName={"active"}
-                
-                
               />
             </div>
           </div>

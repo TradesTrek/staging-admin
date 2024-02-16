@@ -198,7 +198,7 @@ export default function AllTransaction() {
                   setSelectedSubscriptionId(e._id);
                 }
               }}
-              label={e.packageName}
+              label={`${e.category} Plan - ${e.packageName}`}
             />
           ))}
         </Stack>
