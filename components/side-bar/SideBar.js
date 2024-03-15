@@ -335,6 +335,11 @@ export default function SideBar() {
                     <a>Stock Rule</a>
                   </Link>
                 </li>
+                <li className={rout === 'users' ? 'active' : ''}>
+                  <Link href="/admin/suspend-stock">
+                    <a>Suspend stocks</a>
+                  </Link>
+                </li>
               </ul>
             )}
           </li>{' '} 
