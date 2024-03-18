@@ -340,6 +340,11 @@ export default function SideBar() {
                     <a>Suspend stocks</a>
                   </Link>
                 </li>
+                <li className={rout === 'users' ? 'active' : ''}>
+                  <Link href="/admin/suspend-stock">
+                    <a>Sectors</a>
+                  </Link>
+                </li>
               </ul>
             )}
           </li>{' '} 
