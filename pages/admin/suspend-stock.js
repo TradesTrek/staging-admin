@@ -1,10 +1,9 @@
 import Head from "next/head";
-import { Checkbox, Stack } from "@mantine/core";
 
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
-import { useDisclosure } from "@mantine/hooks";
-import { Modal, Button, MultiSelect } from "@mantine/core";
+
+import {  Button, MultiSelect } from "@mantine/core";
 
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
@@ -18,14 +17,6 @@ import getConfig from "next/config";
 import axios from "axios";
 import { useMemo } from "react";
 import { MantineReactTable, useMantineReactTable } from "mantine-react-table";
-
-function set(arr) {
-  return new Set(arr); // Create a Set to remove duplicates
-}
-
-function list(set) {
-  return Array.from(set); // Convert the Set back to an array
-}
 
 export default function AllTransaction() {
   useEffect(() => {
@@ -52,15 +43,7 @@ export default function AllTransaction() {
   const [isToggleLoading, setIsToggleLoading] = useState(false);
   const [pickedStocks, setPickedStocks] = useState([]);
 
-  // useEffect(() => {
-  //   getLogs(!globalFilter ? "" : globalFilter, option, currentPage);
-  // }, [
-  //   globalFilter,
-  //   option,
-  //   pagination.pageIndex, //refetch when page index changes
-  //   pagination.pageSize, //refetch when page size changes
-  // ]);
-
+ 
   useEffect(() => {
     stockService
       .StocksNotSuspended()

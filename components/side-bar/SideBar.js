@@ -341,7 +341,7 @@ export default function SideBar() {
                   </Link>
                 </li>
                 <li className={rout === 'users' ? 'active' : ''}>
-                  <Link href="/admin/suspend-stock">
+                  <Link href="/admin/stock-sectors">
                     <a>Sectors</a>
                   </Link>
                 </li>

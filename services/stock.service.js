@@ -9,9 +9,37 @@ const userSubject = new BehaviorSubject(
 );
 
 
+function getAllStockSectors() {
+  return fetchWrapper
+    .get(`${baseUrl}/stock/sectors`)
+
+    .then((res) => {
+      if (res.success) {
+      }
+      return res;
+    })
+    .catch((error) => {
+      if (error?.length > 0) {
+        return error[0];
+      }
+      return error;
+    });
+}
+
 function StocksNotSuspended() {
     return fetchWrapper
       .get(`${baseUrl}/stock/suspended?isSuspended=false`)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
+
+  function getStocksUnderSector(category) {
+    return fetchWrapper
+      .get(`${baseUrl}/stock/sector-stocks?category=${category}`)
       .then((res) => {
         return res;
       })
@@ -50,6 +78,8 @@ function StocksNotSuspended() {
     },
     StocksNotSuspended,
     toggleStocks,
-    SuspendedStocks
+    SuspendedStocks,
+    getAllStockSectors,
+    getStocksUnderSector
   };
   
