@@ -2,7 +2,7 @@ import Head from "next/head";
 import { Select, Table } from "@mantine/core";
 import SideBar from "../../components/side-bar/SideBar";
 import { stockService } from "../../services/stock.service";
-import { List, ListItem, ListItemText }  from "@mui/material";
+import { List, ListItem, ListItemText } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import React, { useEffect, useState } from "react";
 
@@ -83,7 +83,15 @@ export default function Sectors() {
 
 function SectorList({ data }) {
   return (
-    <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+    <List
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        maxHeight: 500,
+        bgcolor: "background.paper",
+        overflow: 'scroll'
+      }}
+    >
       {data.map((e) => (
         <ListItem key={e}>
           <ListItemText primary={e} />
