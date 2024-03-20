@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Select, Table } from "@mantine/core";
+import { Select, Table, Input } from "@mantine/core";
 import SideBar from "../../components/side-bar/SideBar";
 import { stockService } from "../../services/stock.service";
 import { List, ListItem, ListItemText } from "@mui/material";
