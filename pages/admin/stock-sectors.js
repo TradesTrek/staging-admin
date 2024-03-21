@@ -16,7 +16,7 @@ export default function Sectors() {
   const [selectedSector, setSelectedSector] = useState("");
   const [allSectors, setAllSector] = useState([]);
   const [isAddLoading, setIsAddLoading] = useState("");
-  const [isEditModal, setIsEditModal] = useDisclosure(false);
+  const [isEditModal, setIsEditModal] = useState(false);
 
   useEffect(() => {
     stockService
