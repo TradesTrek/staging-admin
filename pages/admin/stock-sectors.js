@@ -1,23 +1,30 @@
 import Head from "next/head";
-import { Select, Table, Input } from "@mantine/core";
+import { Select, Button, Modal, Checkbox, Stack } from "@mantine/core";
 import SideBar from "../../components/side-bar/SideBar";
 import { stockService } from "../../services/stock.service";
 import { List, ListItem, ListItemText } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import React, { useEffect, useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function Sectors() {
-  const [stockSectors, setStockSectors] = useState([]);
+  const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedStock, setSelectedStock] = useState("");
+  const [sector, setSector] = useState({});
+  const [opened, { open, close }] = useDisclosure(false);
   const [selectedSector, setSelectedSector] = useState("");
-  const [stocksUnderSector, setStocksUnderSectors] = useState([]);
+  const [allSectors, setAllSector] = useState([]);
+  const [isAddLoading, setIsAddLoading] = useState("");
+  const [isEditModal, setIsEditModal] = useDisclosure(false);
 
   useEffect(() => {
     stockService
-      .getAllStockSectors()
+      .StocksNotSuspended()
       .then((res) => {
         if (res.success) {
-          setStockSectors(res.data);
+          const arrayOfSymbols = res.data.map((e) => e.Symbol);
+          setStocks(arrayOfSymbols);
         }
         setIsLoading(false);
       })
@@ -27,21 +34,68 @@ export default function Sectors() {
   }, []);
 
   useEffect(() => {
-    if (!selectedSector) return;
     stockService
-      .getStocksUnderSector(selectedSector)
+      .getAllStockSectors()
       .then((res) => {
         if (res.success) {
-          setStocksUnderSectors(res.data);
+          setAllSector(res.data);
         }
         setIsLoading(false);
       })
       .catch((err) => {
         setIsLoading(false);
       });
-  }, [selectedSector]);
+  }, []);
 
-  console.log(stocksUnderSector);
+  useEffect(() => {
+    if (!selectedStock) return;
+    stockService
+      .getStockSector(selectedStock)
+      .then((res) => {
+        if (res.success) {
+          setSector(res.data);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setIsLoading(false);
+      });
+  }, [selectedStock]);
+
+  const addStockToSector = async () => {
+    try {
+      setIsAddLoading(true);
+      await stockService.addStockToSector({
+        category: selectedSector,
+        symbol: selectedStock,
+      });
+      setIsAddLoading(false);
+      setSelectedSector('')
+      toast.success("Added successfuly");
+      close();
+    } catch (error) {
+      setIsAddLoading(false);
+      toast.error(error.message);
+    }
+  };
+
+  const updateSector = async () => {
+    try {
+      setIsAddLoading(true);
+      await stockService.updateStockToSector({
+        newCategory: selectedSector,
+        stockSymbol: selectedStock,
+      });
+      setIsAddLoading(false);
+      setSelectedSector('')
+      toast.success("Updated successfuly");
+      close();
+    } catch (error) {
+      setIsAddLoading(false);
+      toast.error(error.message);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -50,6 +104,53 @@ export default function Sectors() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <SideBar />
+      <Modal
+        opened={opened}
+        onClose={() => {
+          close();
+        }}
+        title={isEditModal ? "Update" : "Add sector"}
+      >
+        <Stack>
+          {allSectors.map((e, i) => (
+            <Checkbox
+              checked={e === selectedSector}
+              key={i}
+              onChange={() => {
+                if (e === selectedSector) {
+                  setSelectedSector("");
+                } else {
+                  setSelectedSector(e);
+                }
+              }}
+              label={e}
+            />
+          ))}
+
+          <Button
+            className="m-4"
+            variant="filled"
+            disabled={isAddLoading || !selectedSector}
+            style={{ background: "indigo", margin: "10px", float: "right" }}
+            onClick={() => {
+              isEditModal ? updateSector() : addStockToSector()
+            }}
+          >
+            {isAddLoading ? "Loading" : "Add"}
+          </Button>
+        </Stack>
+      </Modal>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="dashboard sideBarOpen">
         <div className="contentWrapper">
           <div className="dashboard_content">
@@ -58,9 +159,10 @@ export default function Sectors() {
             <Select
               label=""
               placeholder="Pick  sector"
-              data={stockSectors}
-              value={selectedSector}
-              onChange={setSelectedSector}
+              data={stocks}
+              value={selectedStock}
+              onChange={setSelectedStock}
+              searchable
             />
 
             <br />
@@ -69,34 +171,34 @@ export default function Sectors() {
 
             {isLoading ? (
               <p>Loading</p>
-            ) : stocksUnderSector.length > 0 ? (
-              <SectorList data={stocksUnderSector} />
-            ) : (
+            ) : !selectedStock ? (
               <></>
+            ) : sector?.category ? (
+              <>
+               <p style={{ color: 'black', fontWeight: 'bolder', marginBottom: 10}}>{sector?.category}</p>
+               <Button variant='filled' onClick={() => {
+                setIsEditModal(true)
+                setSelectedSector(sector?.category)
+                open()
+               }}
+                style={{ background: "indigo" }}
+               >
+                Change sector
+              </Button>
+              </>
+             
+            ) : (
+
+              <Button variant='filled' onClick={() => {
+                setIsEditModal(false)
+                open()
+              } } style={{ background: "indigo" }}>
+                Add to a sector
+              </Button>
             )}
           </div>
         </div>
       </div>
     </>
-  );
-}
-
-function SectorList({ data }) {
-  return (
-    <List
-      sx={{
-        width: "100%",
-        maxWidth: 400,
-        maxHeight: 500,
-        bgcolor: "background.paper",
-        overflow: 'scroll'
-      }}
-    >
-      {data.map((e) => (
-        <ListItem key={e}>
-          <ListItemText primary={e} />
-        </ListItem>
-      ))}
-    </List>
   );
 }

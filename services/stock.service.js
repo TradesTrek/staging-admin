@@ -37,6 +37,17 @@ function StocksNotSuspended() {
       });
   }
 
+  function getStockSector(stock){
+    return fetchWrapper
+    .get(`${baseUrl}/stock/sector?stockSymbol=${stock}`)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+  }
+
   function getStocksUnderSector(category) {
     return fetchWrapper
       .get(`${baseUrl}/stock/sector-stocks?category=${category}`)
@@ -71,6 +82,28 @@ function StocksNotSuspended() {
       });
   }
 
+  function addStockToSector(body) {
+    return fetchWrapper
+      .post(`${baseUrl}/stock/addSector`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
+
+  function updateStockToSector(body) {
+    return fetchWrapper
+      .put(`${baseUrl}/stock/sector`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
+
   export const stockService = {
     user: userSubject.asObservable(),
     get userValue() {
@@ -80,6 +113,9 @@ function StocksNotSuspended() {
     toggleStocks,
     SuspendedStocks,
     getAllStockSectors,
-    getStocksUnderSector
+    getStocksUnderSector,
+    getStockSector,
+    addStockToSector,
+    updateStockToSector
   };
   
