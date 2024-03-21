@@ -88,6 +88,7 @@ export default function Sectors() {
       });
       setIsAddLoading(false);
       setSelectedSector('')
+      setSector({})
       toast.success("Updated successfuly");
       close();
     } catch (error) {
@@ -173,7 +174,7 @@ export default function Sectors() {
               <p>Loading</p>
             ) : !selectedStock ? (
               <></>
-            ) : sector?.category ? (
+            ) : sector?.category ? isEditModal ? (
               <>
                <p style={{ color: 'black', fontWeight: 'bolder', marginBottom: 10}}>{sector?.category}</p>
                <Button variant='filled' onClick={() => {
@@ -195,7 +196,7 @@ export default function Sectors() {
               } } style={{ background: "indigo" }}>
                 Add to a sector
               </Button>
-            )}
+            )  : <></>}
           </div>
         </div>
       </div>
