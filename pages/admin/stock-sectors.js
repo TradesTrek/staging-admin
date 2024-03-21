@@ -70,7 +70,7 @@ export default function Sectors() {
         symbol: selectedStock,
       });
       setIsAddLoading(false);
-      setSelectedSector('')
+      setSelectedSector("");
       toast.success("Added successfuly");
       close();
     } catch (error) {
@@ -87,13 +87,63 @@ export default function Sectors() {
         stockSymbol: selectedStock,
       });
       setIsAddLoading(false);
-      setSelectedSector('')
-      setSector({})
+      setSelectedSector("");
+      setSector({});
       toast.success("Updated successfuly");
       close();
     } catch (error) {
       setIsAddLoading(false);
       toast.error(error.message);
+    }
+  };
+
+  const View = () => {
+    if (isLoading) {
+      return <p>Loading</p>;
+    }
+
+    if (selectedStock) {
+      if (sector?.category) {
+        return (
+          <>
+            <p
+              style={{
+                color: "black",
+                fontWeight: "bolder",
+                marginBottom: 10,
+              }}
+            >
+              {sector?.category}
+            </p>
+            <Button
+              variant="filled"
+              onClick={() => {
+                setIsEditModal(true);
+                setSelectedSector(sector?.category);
+                open();
+              }}
+              style={{ background: "indigo" }}
+            >
+              Change sector
+            </Button>
+          </>
+        );
+      } else {
+        return (
+          <Button
+            variant="filled"
+            onClick={() => {
+              setIsEditModal(false);
+              open();
+            }}
+            style={{ background: "indigo" }}
+          >
+            Add to a sector
+          </Button>
+        );
+      }
+    } else {
+      return <></>;
     }
   };
 
@@ -134,7 +184,7 @@ export default function Sectors() {
             disabled={isAddLoading || !selectedSector}
             style={{ background: "indigo", margin: "10px", float: "right" }}
             onClick={() => {
-              isEditModal ? updateSector() : addStockToSector()
+              isEditModal ? updateSector() : addStockToSector();
             }}
           >
             {isAddLoading ? "Loading" : isEditModal ? "Update" : "Add"}
@@ -170,33 +220,7 @@ export default function Sectors() {
             <br />
             <br />
 
-            {isLoading ? (
-              <p>Loading</p>
-            ) : !selectedStock ? (
-              <></>
-            ) : sector?.category ? isEditModal ? (
-              <>
-               <p style={{ color: 'black', fontWeight: 'bolder', marginBottom: 10}}>{sector?.category}</p>
-               <Button variant='filled' onClick={() => {
-                setIsEditModal(true)
-                setSelectedSector(sector?.category)
-                open()
-               }}
-                style={{ background: "indigo" }}
-               >
-                Change sector
-              </Button>
-              </>
-             
-            ) : (
-
-              <Button variant='filled' onClick={() => {
-                setIsEditModal(false)
-                open()
-              } } style={{ background: "indigo" }}>
-                Add to a sector
-              </Button>
-            )  : <></>}
+            <View />
           </div>
         </div>
       </div>
