@@ -87,7 +87,7 @@ export default function Sectors() {
         newCategory: selectedSector,
         stockSymbol: selectedStock,
       });
-      
+      setSelectedStock("")
       setSelectedSector("");
       setSector({});
       toast.success("Updated successfuly");
@@ -214,7 +214,7 @@ export default function Sectors() {
 
             <Select
               label=""
-              placeholder="Pick  sector"
+              placeholder="Pick a stock"
               data={stocks}
               value={selectedStock}
               onChange={setSelectedStock}

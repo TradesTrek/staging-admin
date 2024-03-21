@@ -1,20 +1,16 @@
 import Head from "next/head";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 
-import {  Button, MultiSelect } from "@mantine/core";
-
+import { MultiSelect } from "@mantine/core";
+import { Button } from "@mui/material";
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
 import { stockService } from "../../services/stock.service";
 import { toast, ToastContainer } from "react-toastify";
 
 import ReactPaginate from "react-paginate";
-import { confirmAlert } from "react-confirm-alert";
-
-import getConfig from "next/config";
-import axios from "axios";
 import { useMemo } from "react";
 import { MantineReactTable, useMantineReactTable } from "mantine-react-table";
 
@@ -42,13 +38,14 @@ export default function AllTransaction() {
   const [totalPage, setTotalPage] = useState(0);
   const [isToggleLoading, setIsToggleLoading] = useState(false);
   const [pickedStocks, setPickedStocks] = useState([]);
+  const [stckz, setStckz] = useState([]);
 
- 
   useEffect(() => {
     stockService
       .StocksNotSuspended()
       .then((res) => {
         if (res.success) {
+          setStckz(res.data);
           setAllStock(res.data.map((e) => e.Name));
         }
         setIsLoading(false);
@@ -63,7 +60,9 @@ export default function AllTransaction() {
       .SuspendedStocks()
       .then((res) => {
         if (res.success) {
-          setSuspendedStocks(res.data.map((e) => ({ Name: e.Name })));
+          setSuspendedStocks(
+            res.data.map((e) => ({ Name: e.Name, Symbol: e.Symbol }))
+          );
         }
         setIsLoading(false);
       })
@@ -72,7 +71,9 @@ export default function AllTransaction() {
       });
   }, []);
 
-
+  const getSymbolFromStock = (name) => {
+    return stckz.filter((e) => e.Name === name)[0].Symbol;
+  };
   const suspend = async () => {
     setIsToggleLoading(true);
 
@@ -85,7 +86,10 @@ export default function AllTransaction() {
         const filteredUnSuspendedStocks = allStock.filter(
           (item) => !stockNames.includes(item)
         );
-        const toBeAdded = stockNames.map((e) => ({ Name: e }));
+        const toBeAdded = stockNames.map((e) => ({
+          Name: e,
+          Symbol: getSymbolFromStock(e),
+        }));
 
         setSuspendedStocks([...suspendedStocks, ...toBeAdded]);
         setAllStock(filteredUnSuspendedStocks);
@@ -103,19 +107,21 @@ export default function AllTransaction() {
 
     const pickedStocks = Object.keys(rowSelection)
       .map((index) => suspendedStocks[index])
-      .filter((item) => item !== undefined)
-      
-      const stockNames = pickedStocks.map(e => e.Name)
+      .filter((item) => item !== undefined);
+
+    const stockNames = pickedStocks.map((e) => e.Name);
 
     try {
       const res = await stockService.toggleStocks({ stockNames });
-    
 
       if (res.success) {
         setRowSelection({});
-        const filteredArray = suspendedStocks.filter(item => !pickedStocks.some(filterItem => filterItem.Name === item.Name));
-        setSuspendedStocks(filteredArray)
-        setAllStock([ ...stockNames , ...allStock]);
+        const filteredArray = suspendedStocks.filter(
+          (item) =>
+            !pickedStocks.some((filterItem) => filterItem.Name === item.Name)
+        );
+        setSuspendedStocks(filteredArray);
+        setAllStock([...stockNames, ...allStock]);
         toast.success(res.message);
       }
       setIsToggleLoading(false);
@@ -156,7 +162,11 @@ export default function AllTransaction() {
     () => [
       {
         accessorKey: "Name", // Access data directly with key
-        header: "Stock",
+        header: "Stock Name",
+      },
+      {
+        accessorKey: "Symbol",
+        header: "Stock Symbol",
       },
     ],
     []
@@ -206,9 +216,11 @@ export default function AllTransaction() {
             {pickedStocks.length > 0 && (
               <Button
                 className=""
-                variant="filled"
+                variant="contained"
                 disabled={isToggleLoading}
-                style={{ background: "indigo", margin: "10px", float: "right", marginTop: '23px' }}
+                style={{
+                  margin: "10px",
+                }}
                 onClick={suspend}
               >
                 {isToggleLoading ? "Loading" : "Suspend"}
