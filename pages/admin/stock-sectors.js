@@ -9,7 +9,7 @@ import { useDisclosure } from "@mantine/hooks";
 
 export default function Sectors() {
   const [stocks, setStocks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedStock, setSelectedStock] = useState("");
   const [sector, setSector] = useState({});
   const [opened, { open, close }] = useDisclosure(false);
@@ -69,10 +69,11 @@ export default function Sectors() {
         category: selectedSector,
         symbol: selectedStock,
       });
-      setIsAddLoading(false);
+      
       setSelectedSector("");
       toast.success("Added successfuly");
       close();
+      setIsAddLoading(false);
     } catch (error) {
       setIsAddLoading(false);
       toast.error(error.message);
@@ -86,11 +87,14 @@ export default function Sectors() {
         newCategory: selectedSector,
         stockSymbol: selectedStock,
       });
-      setIsAddLoading(false);
+      
       setSelectedSector("");
       setSector({});
       toast.success("Updated successfuly");
+      
+      
       close();
+      setIsAddLoading(false);
     } catch (error) {
       setIsAddLoading(false);
       toast.error(error.message);
@@ -98,7 +102,7 @@ export default function Sectors() {
   };
 
   const View = () => {
-    if (isLoading) {
+    if (isLoading || isAddLoading) {
       return <p>Loading</p>;
     }
 
@@ -147,6 +151,7 @@ export default function Sectors() {
     }
   };
 
+ 
   return (
     <>
       <Head>
