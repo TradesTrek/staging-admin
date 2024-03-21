@@ -136,7 +136,7 @@ export default function Sectors() {
               isEditModal ? updateSector() : addStockToSector()
             }}
           >
-            {isAddLoading ? "Loading" : "Add"}
+            {isAddLoading ? "Loading" : isEditModal ? "Update" : "Add"}
           </Button>
         </Stack>
       </Modal>
