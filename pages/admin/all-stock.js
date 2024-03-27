@@ -217,8 +217,9 @@ export default function AllStock() {
                 </li>
                 <li>
                   <ReactDatePicker
+                    
                     name="holidayDate"
-                    className="allstockdatepicker"
+                    wrapperClassName="allStockDatepicker"
                     // value={selectedDate}
                     selected={selectedDate}
                     onChange={setSelectedDate}
