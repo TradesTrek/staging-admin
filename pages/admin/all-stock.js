@@ -2,7 +2,8 @@ import Head from "next/head";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
-
+import "react-datepicker/dist/react-datepicker.css";
+import ReactDatePicker from "react-datepicker";
 import SideBar from "../../components/side-bar/SideBar";
 
 import { subscriptionService } from "../../services/subscription.service";
@@ -14,6 +15,11 @@ import { CSVLink } from "react-csv";
 import ExportExcel from "../../helpers/ExportExcel";
 import ExportPdf from "../../helpers/ExportPdf";
 
+const isCurrentDate = (date) => {
+  const currentDate = new Date();
+  return date.toDateString() === currentDate.toDateString();
+};
+
 export default function AllStock() {
   useEffect(() => {
     document.body.classList.remove("has--tabs");
@@ -21,17 +27,18 @@ export default function AllStock() {
 
   const [allStock, setAllStock] = useState();
   const [option, setOption] = useState({ LastTradeTime: -1 });
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Today's date by default
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalPage, setTotalPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const [csvDownloading,setCsvDownloading]=useState(false)
-  const [xlsxDownloading,setXlsxDownloading]=useState(false)
-  const [pdfDownloading,setPdfDownloading]=useState(false)
+  const [csvDownloading, setCsvDownloading] = useState(false);
+  const [xlsxDownloading, setXlsxDownloading] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
   const allStockRef = useRef();
-  const [downloadStockData,setDownloadStockData]=useState([])
+  const [downloadStockData, setDownloadStockData] = useState([]);
   const competitionHeaders = [
     {
       label: "Name",
@@ -43,13 +50,17 @@ export default function AllStock() {
     { label: "Change(₦)", key: "Change" },
     { label: "Per Change(%)", key: "PerChange" },
     { label: "Last Update", key: "LastTradeTime" },
-
-   
   ];
 
   useEffect(() => {
+    if (!isCurrentDate(selectedDate)) {
+      option.TradeDate = selectedDate.toISOString().slice(0, 10);
+    }
+
     getAllStock(currentPage, search, option);
-  }, [option]);
+  }, [option, selectedDate]);
+
+
   const getAllStock = (page, str, op) => {
     setIsLoading(true);
     userService
@@ -65,6 +76,11 @@ export default function AllStock() {
         setIsLoading(false);
         console.log(err);
       });
+  };
+
+  const isWeekday = (date) => {
+    const day = date.getDay();
+    return day !== 0 && day !== 6;
   };
 
   const handlePageClick = ({ selected }) => {
@@ -86,8 +102,7 @@ export default function AllStock() {
   //   }, 2000);
   // };
   const downloadStock = async (str) => {
-   
-    const { data } =  await userService.downloadAllStock(search,option);
+    const { data } = await userService.downloadAllStock(search, option);
     setDownloadStockData(data);
     if (str == "csv") {
       setTimeout(() => {
@@ -96,12 +111,14 @@ export default function AllStock() {
       }, 1000);
     } else if (str == "xlsx") {
       ExportExcel(competitionHeaders, data, "refferal");
-      setXlsxDownloading(false)
+      setXlsxDownloading(false);
     } else if (str == "pdf") {
       ExportPdf(competitionHeaders, data, "refferal");
-      setPdfDownloading(false)
+      setPdfDownloading(false);
     }
   };
+
+  console.log(selectedDate)
   return (
     <>
       <Head>
@@ -127,69 +144,90 @@ export default function AllStock() {
                   </form>
                 </li>
                 <li>
-            {csvDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setCsvDownloading(true)
-                  downloadStock("csv")}}>
-                  Export as CSV
-                </a>
-              </Link>
-            )}
-               <CSVLink
-              style={{ display: "none" }}
-              ref={allStockRef}
-              headers={competitionHeaders}
-              data={downloadStockData}
-            >
-              Download me
-            </CSVLink>
-          </li>
-          <li>
-            {xlsxDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setXlsxDownloading(true)
-                  downloadStock("xlsx")
-                }}>
-                  Export as xlsx
-                </a>
-              </Link>
-            )}
-
-         
-          </li>
-          <li>
-            {" "}
-            {pdfDownloading ? (
-              <Link href="javascript:void(0)">
-                <a className="btn spinnerBtn">
-                  <FormSpinner />
-                </a>
-              </Link>
-            ) : (
-              <Link href="javascript:void(0)">
-                <a className="btn" onClick={() => {
-                  setPdfDownloading(true)
-                  downloadStock("pdf")
-                }}>
-                  Export as PDF
-                </a>
-              </Link>
-            )}
-          </li>
+                  {csvDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setCsvDownloading(true);
+                          downloadStock("csv");
+                        }}
+                      >
+                        Export as CSV
+                      </a>
+                    </Link>
+                  )}
+                  <CSVLink
+                    style={{ display: "none" }}
+                    ref={allStockRef}
+                    headers={competitionHeaders}
+                    data={downloadStockData}
+                  >
+                    Download me
+                  </CSVLink>
+                </li>
+                <li>
+                  {xlsxDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setXlsxDownloading(true);
+                          downloadStock("xlsx");
+                        }}
+                      >
+                        Export as xlsx
+                      </a>
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  {" "}
+                  {pdfDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setPdfDownloading(true);
+                          downloadStock("pdf");
+                        }}
+                      >
+                        Export as PDF
+                      </a>
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  <ReactDatePicker
+                    name="holidayDate"
+                    className="btn"
+                    // value={selectedDate}
+                    selected={selectedDate}
+                    onChange={setSelectedDate}
+                    minDate={new Date(2023, 11, 22)}
+                    maxDate={new Date()}
+                    filterDate={isWeekday}
+                    placeholderText="Select day"
+                  />
+                </li>
               </ul>
             </div>
             <div className="table--layout">
@@ -319,11 +357,11 @@ export default function AllStock() {
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOption({
-                            LastTradeTime: option.LastTradeTime == 1 ? -1 : 1,
+                            TradeDate: option.TradeDate == 1 ? -1 : 1,
                           });
                         }}
                       >
-                        Last Change
+                        Trade Date
                       </th>
 
                       {/* <th style={{ width: "4rem" }} className="sorting__disabled">
@@ -349,7 +387,7 @@ export default function AllStock() {
                             <td>₦{item.Change?.toFixed(2)}</td>
                             <td>{item.PerChange}</td>
 
-                            <td>{moment(item.LastTradeTime).format("ll")}</td>
+                            <td>{moment(item.TradeDate).format("ll")}</td>
                             {/* item.packageDuration == "trial" && */}
                           </tr>
                         );

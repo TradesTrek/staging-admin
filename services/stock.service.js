@@ -48,16 +48,6 @@ function StocksNotSuspended() {
     });
   }
 
-  function getStocksUnderSector(category) {
-    return fetchWrapper
-      .get(`${baseUrl}/stock/sector-stocks?category=${category}`)
-      .then((res) => {
-        return res;
-      })
-      .catch(function (error) {
-        return error;
-      });
-  }
 
   function SuspendedStocks() {
     return fetchWrapper
@@ -113,7 +103,6 @@ function StocksNotSuspended() {
     toggleStocks,
     SuspendedStocks,
     getAllStockSectors,
-    getStocksUnderSector,
     getStockSector,
     addStockToSector,
     updateStockToSector
