@@ -15,6 +15,14 @@ html body {
   font-family: 'Archivo', sans-serif;
 }
 
+.allStockDatepicker  {
+  height: 38px;
+  padding: 15px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+
 .pageBanner {
   /* background-image: url('../public/images/page-banner.png');
     height: 20rem;
