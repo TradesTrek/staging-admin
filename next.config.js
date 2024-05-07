@@ -25,6 +25,6 @@ module.exports = {
   images: {
     loader: 'imgix',
     path:  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000' : 'https://client-staging-green.vercel.app/',
+    ? 'http://localhost:3000' : 'https://staging-admin.vercel.app/',
   },
 };
