@@ -50,7 +50,7 @@ function patchMethod(url, body) {
     body: body,
   };
   return fetch(url, requestOptions).then(handleResponse);
-}
+};
 
 function put(url, body) {
   const requestOptions = {
@@ -59,7 +59,7 @@ function put(url, body) {
     body: JSON.stringify(body),
   };
   return fetch(url, requestOptions).then(handleResponse);
-}
+};
 
 function patch(url, body) {
   const requestOptions = {
