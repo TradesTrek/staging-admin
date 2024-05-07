@@ -1,0 +1,686 @@
+import Head from "next/head";
+import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
+import DashboardHeader from "../../components/header/DashboardHeader";
+import "react-datepicker/dist/react-datepicker.css";
+import ReactDatePicker from "react-datepicker";
+import SideBar from "../../components/side-bar/SideBar";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import { ToastContainer } from "react-toastify";
+import DialogTitle from "@mui/material/DialogTitle";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import moment from "moment";
+import FormSpinner from "../../components/Spinners/FormSpinner";
+import { userService } from "../../services";
+import { stockService } from "../../services/stock.service";
+import ReactPaginate from "react-paginate";
+import { CSVLink } from "react-csv";
+import ExportExcel from "../../helpers/ExportExcel";
+import ExportPdf from "../../helpers/ExportPdf";
+import ExtraStockDetailsForm from "../../components/stock/ExtraDetailForm";
+import ExtraDetailEditForm from "../../components/stock/ExtraDetailEditForm";
+
+import { Modal, Button } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+
+const isCurrentDate = (date) => {
+  const currentDate = new Date();
+  return date.toDateString() === currentDate.toDateString();
+};
+
+export default function AllStock() {
+  useEffect(() => {
+    document.body.classList.remove("has--tabs");
+  });
+
+  const [allStock, setAllStock] = useState();
+  const [tableAction, setTableAction] = useState(false);
+  const [isUserToggle, setIsUserToggle] = useState();
+  const [option, setOption] = useState({ LastTradeTime: -1 });
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Today's date by default
+  const [addMoreDetailsForm, setAddMoreDetailsForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalPage, setTotalPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+
+  const [csvDownloading, setCsvDownloading] = useState(false);
+  const [xlsxDownloading, setXlsxDownloading] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
+  const allStockRef = useRef();
+  const [downloadStockData, setDownloadStockData] = useState([]);
+  const competitionHeaders = [
+    {
+      label: "Name",
+      key: "Name",
+    },
+    { label: "Symbol", key: "Symbol" },
+    { label: "Price(₦)", key: "Last" },
+    { label: "Volume", key: "Volume" },
+    { label: "Change(₦)", key: "Change" },
+    { label: "Per Change(%)", key: "PerChange" },
+    { label: "Last Update", key: "LastTradeTime" },
+  ];
+
+  useEffect(() => {
+    if (!isCurrentDate(selectedDate)) {
+      option.TradeDate = selectedDate.toISOString().slice(0, 10);
+    }
+
+    getAllStock(currentPage, search, option);
+  }, [option, selectedDate]);
+
+  const getAllStock = (page, str, op) => {
+    setIsLoading(true);
+    userService
+      .getAllStock(page, str, op)
+      .then((res) => {
+        if (res.success) {
+          setAllStock(res.data);
+          setTotalPage(res.totalPage);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        console.log(err);
+      });
+  };
+
+  const isWeekday = (date) => {
+    const day = date.getDay();
+    return day !== 0 && day !== 6;
+  };
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected + 1);
+    getAllStock(selected + 1, search, option);
+  };
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+    getAllStock(1, e.target.value, option);
+  };
+  // const downloadStock = async () => {
+  // setDownloading(true);
+  // const { data } = await userService.downloadAllStock();
+  // setAllStockDownloading(data);
+  // setTimeout(() => {
+  // allStockRef.current.link.click();
+  // setDownloading(false);
+  // }, 2000);
+  // };
+  const downloadStock = async (str) => {
+    const { data } = await userService.downloadAllStock(search, option);
+    setDownloadStockData(data);
+    if (str == "csv") {
+      setTimeout(() => {
+        allStockRef.current.link.click();
+        setCsvDownloading(false);
+      }, 1000);
+    } else if (str == "xlsx") {
+      ExportExcel(competitionHeaders, data, "refferal");
+      setXlsxDownloading(false);
+    } else if (str == "pdf") {
+      ExportPdf(competitionHeaders, data, "refferal");
+      setPdfDownloading(false);
+    }
+  };
+
+  return (
+    <>
+      <Head>
+        <title>All Stock</title>
+        <meta name="description" content="Generated by create next app" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <SideBar />
+      <div className="dashboard sideBarOpen">
+        <DashboardHeader />
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <div className="contentWrapper">
+          <div className="dashboard_content">
+            <h1 className="dashboard__title">All Stocks</h1>
+            <div className="btnLists manager">
+              <ul>
+                <li>
+                  <form>
+                    <input
+                      type="text"
+                      placeholder="Search by Stock name and symbol..."
+                      onChange={(e) => handleSearch(e)}
+                    />
+                  </form>
+                </li>
+                <li>
+                  {csvDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setCsvDownloading(true);
+                          downloadStock("csv");
+                        }}
+                      >
+                        Export as CSV
+                      </a>
+                    </Link>
+                  )}
+                  <CSVLink
+                    style={{ display: "none" }}
+                    ref={allStockRef}
+                    headers={competitionHeaders}
+                    data={downloadStockData}
+                  >
+                    Download me
+                  </CSVLink>
+                </li>
+                <li>
+                  {xlsxDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setXlsxDownloading(true);
+                          downloadStock("xlsx");
+                        }}
+                      >
+                        Export as xlsx
+                      </a>
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  {" "}
+                  {pdfDownloading ? (
+                    <Link href="javascript:void(0)">
+                      <a className="btn spinnerBtn">
+                        <FormSpinner />
+                      </a>
+                    </Link>
+                  ) : (
+                    <Link href="javascript:void(0)">
+                      <a
+                        className="btn"
+                        onClick={() => {
+                          setPdfDownloading(true);
+                          downloadStock("pdf");
+                        }}
+                      >
+                        Export as PDF
+                      </a>
+                    </Link>
+                  )}
+                </li>
+                <li>
+                  <ReactDatePicker
+                    name="holidayDate"
+                    wrapperClassName="allStockDatepicker"
+                    selected={selectedDate}
+                    onChange={setSelectedDate}
+                    minDate={new Date(2023, 11, 22)}
+                    maxDate={new Date()}
+                    filterDate={isWeekday}
+                    placeholderText="Select day"
+                  />
+                </li>
+              </ul>
+            </div>
+            <div className="table--layout">
+              {isLoading ? (
+                <FormSpinner />
+              ) : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th
+                        style={{ width: "3rem" }}
+                        className="sorting__disabled"
+                      >
+                        Sr. No
+                      </th>
+                      <th
+                        className={
+                          option.Name == 1
+                            ? "desc"
+                            : option.Name == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            Name: option.Name == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Name
+                      </th>
+                      <th
+                        className={
+                          option.Symbol == 1
+                            ? "desc"
+                            : option.Symbol == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            Symbol: option.Symbol == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Symbol
+                      </th>
+                      <th
+                        className={
+                          option.Last == 1
+                            ? "desc"
+                            : option.Last == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            Last: option.Last == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Price (₦)
+                      </th>
+                      <th
+                        className={
+                          option.Volume == 1
+                            ? "desc"
+                            : option.Volume == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            Volume: option.Volume == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Volume
+                      </th>
+
+                      <th
+                        className={
+                          option.Change == 1
+                            ? "desc"
+                            : option.Change == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            Change: option.Change == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Change (₦)
+                      </th>
+                      <th
+                        className={
+                          option.PerChange == 1
+                            ? "desc"
+                            : option.PerChange == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            PerChange: option.PerChange == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Change (%)
+                      </th>
+                      <th
+                        className={
+                          option.LastTradeTime == 1
+                            ? "desc"
+                            : option.LastTradeTime == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            TradeDate: option.TradeDate == 1 ? -1 : 1,
+                          });
+                        }}
+                      >
+                        Trade Date
+                      </th>
+
+                      <th
+                        style={{ width: "4rem" }}
+                        className="sorting__disabled"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allStock &&
+                      allStock.length > 0 &&
+                      allStock.map((item, i) => {
+                        return (
+                          <tr key={i}>
+                            <td>
+                              {/* <input type="checkbox" /> */}
+                              {(currentPage - 1) * 10 + i + 1}
+                            </td>
+                            <td>{item.Name}</td>
+                            <td>{item.Symbol}</td>
+                            <td>₦{item.Last?.toFixed(2)}</td>
+                            <td>{item.Volume}</td>
+
+                            <td>₦{item.Change?.toFixed(2)}</td>
+                            <td>{item.PerChange}</td>
+
+                            <td>{moment(item.TradeDate).format("ll")}</td>
+
+                            <MoreAction
+                              item={item}
+                              setIsUserToggle={setIsUserToggle}
+                              setTableAction={setTableAction}
+                              tableAction={tableAction}
+                              isUserToggle={isUserToggle}
+                            />
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              )}
+
+              <ReactPaginate
+                previousLabel={"prev"}
+                nextLabel={"next"}
+                breakLabel={"..."}
+                breakClassName={"break-me"}
+                pageCount={totalPage}
+                forcePage={currentPage - 1}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={1}
+                onPageChange={handlePageClick}
+                containerClassName={"pagination"}
+                subContainerClassName={"pages pagination"}
+                activeClassName={"active"}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function MoreAction({
+  item,
+  setTableAction,
+  setIsUserToggle,
+  tableAction,
+  isUserToggle,
+}) {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedStock, setSelectedStock] = useState("");
+  const [extraDetails, setExtraDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sector, setSector] = useState(null);
+  const [refetchCounter, setRefetchCounter] = useState(1);
+  const [viewExtraDetails, setViewExtraDetails] = useState(false);
+  const [addOrEdit, setAddOrEdit] = useState("");
+  const [exchangesData, setExchangesData] = useState([]);
+  const [subSectorData, setSubSectorData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await stockService.getExtraStockDetails(item._id);
+
+        setExtraDetails(data.extraDetails);
+        setSector(data.sector.category);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [item, refetchCounter]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [response1, response2] = await Promise.all([
+          stockService.getExchange(),
+          stockService.getSubSectors(),
+        ]);
+        setExchangesData(response1.data);
+        setSubSectorData(response2.data);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const shutDown = () => {
+    setSelectedStock("");
+    setAddOrEdit("");
+    close();
+  };
+
+  const closeVerticalDots = () => {
+    setTableAction(!tableAction);
+    setIsUserToggle(item._id);
+  };
+
+  return loading ? (
+    <td>loading</td>
+  ) : (
+    <>
+      <td onClick={closeVerticalDots}>
+        <span className="three--vertical--dots">
+          <span></span>
+          <span></span>
+          <span onClick={closeVerticalDots}></span>
+        </span>
+      </td>
+
+      <div className="actionData">
+        {tableAction && isUserToggle === item._id ? (
+          <span className="tableActions" key={isUserToggle}>
+            {extraDetails && (
+              <Link href="javascript:void(0)">
+                <a
+                  className="edit__detail"
+                  onClick={() => {
+                    setSelectedStock(item);
+                    setAddOrEdit("edit");
+                    open();
+                  }}
+                >
+                  Edit Extra details
+                </a>
+              </Link>
+            )}
+
+            {!extraDetails && (
+              <Link href="javascript:void(0)">
+                <a
+                  className="edit__detail"
+                  onClick={() => {
+                    setSelectedStock(item);
+                    setAddOrEdit("add");
+                    open();
+                  }}
+                >
+                  Add Extra details
+                </a>
+              </Link>
+            )}
+
+            {extraDetails && (
+              <Link href="javascript:void(0)">
+                <a
+                  className="view__lock"
+                  onClick={() => {
+                    setSelectedStock(item);
+                    setViewExtraDetails(true);
+                  }}
+                >
+                  View Extra Details
+                </a>
+              </Link>
+            )}
+          </span>
+        ) : (
+          ""
+        )}
+
+        {addOrEdit === "add" && (
+          <Modal
+            opened={opened}
+            onClose={shutDown}
+            title={`Add More Stock Details for ${selectedStock.Name}`}
+          >
+            <ExtraStockDetailsForm
+              closeVerticalDots={closeVerticalDots}
+              shutDown={shutDown}
+              selectedStock={selectedStock}
+              setRefetchCounter={setRefetchCounter}
+              exchangesData={exchangesData}
+              subSectorData={subSectorData}
+            />
+          </Modal>
+        )}
+
+        {addOrEdit === "edit" && (
+          <Modal
+            opened={opened}
+            onClose={shutDown}
+            title={`Edit ${selectedStock.Name} Stock Details`}
+          >
+            <ExtraDetailEditForm
+              closeVerticalDots={closeVerticalDots}
+              shutDown={shutDown}
+              selectedStock={selectedStock}
+              setRefetchCounter={setRefetchCounter}
+              extraDetails={extraDetails}
+              exchangesData={exchangesData}
+              subSectorData={subSectorData}
+            />
+          </Modal>
+        )}
+
+        <Dialog
+          fullWidth
+          open={viewExtraDetails}
+          onClose={() => setViewExtraDetails(false)}
+        >
+          <DialogTitle>{selectedStock?.Name} Stock Details</DialogTitle>
+          <DialogContent>
+            <TableContainer component={Paper}>
+              {extraDetails && (
+                <ExtraDetailsTable
+                  sector={sector}
+                  extraDetails={extraDetails}
+                />
+              )}
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setViewExtraDetails(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </>
+  );
+}
+
+function ExtraDetailsTable({ extraDetails, sector }) {
+  if (!extraDetails) return null; // Handle case where extraDetails is not yet available
+
+  const data = Object.entries(extraDetails) // Convert object to key-value pairs
+    .filter(([key]) => key !== "_id" && key !== "stockId" && key !== "__v") // Exclude unwanted keys
+    .map(([key, value]) => {
+      if (
+        key === "createdAt" ||
+        key === "updatedAt" ||
+        key === "FoundedDate" ||
+        key === "DateListed"
+      ) {
+        return { key, value: value ? moment(value).format("YYYY-MM-DD") : "-" }; // Format dates
+      }
+
+      if (key === "BoardOfDirectors") {
+        return { key, value: value.join(", ") };
+      }
+
+      return { key, value };
+    });
+  data.push({ key: "sector", value: sector });
+
+  return (
+    <TableContainer component={Paper} sx={{ mt: 2 }}>
+      <Table aria-label="extra details table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Field</TableCell>
+            <TableCell>Value</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((row) => (
+            <TableRow key={row.key}>
+              <TableCell component="th" scope="row">
+                {row.key}
+              </TableCell>
+              <TableCell align="right">{row.value || "-"}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
