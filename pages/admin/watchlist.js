@@ -4,11 +4,8 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import DashboardHeader from "../../components/header/DashboardHeader";
 import AddHoliday from "../../components/holiday/AddHoliday";
-import EditHoliday from "../../components/holiday/EditHoliday";
 import SideBar from "../../components/side-bar/SideBar";
 import { userService } from "../../services";
-import { confirmAlert } from "react-confirm-alert";
-import { toast } from "react-toastify";
 import moment from "moment";
 import FormSpinner from "../../components/Spinners/FormSpinner";
 import ReactPaginate from "react-paginate";
@@ -70,11 +67,6 @@ export default function AllUsers() {
       });
   };
 
-  const addUserCloseModal = () => {
-    setAddUserForm(false);
-    getHoliday(search, option, currentPage);
-  };
-
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
@@ -84,8 +76,8 @@ export default function AllUsers() {
     getHoliday(search, option, selected + 1);
   };
   const downloadHoliday = async (str) => {
-    const { data } = await userService.downloadHoliday(search, option);
-    setDownloadHolidayData(data);
+    const { data } = await userService.getUserWatchList(search, page, data);
+    setDownloadHolidayData(data.docs);
     if (str == "csv") {
       setTimeout(() => {
         allHolidayRef.current.link.click();
@@ -199,83 +191,12 @@ export default function AllUsers() {
                   )}
                 </li>
 
-                {/* <li>
-                  <form>
-                    <input type="text" placeholder="Search by User Name..." />
-                  </form>
-                </li> */}
+           
               </ul>
             </div>
 
-            {/* Filter Options Form */}
-            <div
-              onClick={() => setTableAction(false)}
-              className={
-                filterAction
-                  ? "filter__actions filter__smooth"
-                  : "filter__actions"
-              }
-            >
-              <div className="filter__title">Filter</div>
-              <div
-                className="filter__close"
-                onClick={() => setFilterAction(!filterAction)}
-              >
-                X
-              </div>
-              <form>
-                <div className="form--item">
-                  <label className="form--label">Lock Brand Name</label>
-                  <select className="form--control">
-                    <option>Brand 1</option>
-                    <option>Brand 2</option>
-                  </select>
-                </div>
-                <div className="form--item">
-                  <label className="form--label">Comapny Name</label>
-                  <select className="form--control">
-                    <optgroup label="Dubai">
-                      <option>Company 1</option>
-                      <option>Company 2</option>
-                      <option>Company 3</option>
-                      <option>Company 4</option>
-                    </optgroup>
-                    <optgroup label="UAE">
-                      <option>Company 1</option>
-                      <option>Company 2</option>
-                      <option>Company 3</option>
-                      <option>Company 4</option>
-                    </optgroup>
-                  </select>
-                </div>
-                {/* <div className="form--item">
-                  <label className="form--label">Lock Status</label>
-                  <select className="form--control">
-                    <option>Assigned Locks</option>
-                    <option>Active Locks</option>
-                    <option>In Active Locks</option>
-                  </select>
-                </div> */}
-              </form>
-            </div>
-
-            {/* Add Lock Form */}
-            {addUserForm && <div className="layout--overlay--bg"></div>}
-            <div
-              className={
-                addUserForm ? "form--layout form--active" : "form--layout"
-              }
-            >
-              <div
-                className="form__close"
-                onClick={() => setAddUserForm(!addUserForm)}
-              >
-                X
-              </div>
-              {addUserForm && (
-                <AddHoliday addUserCloseModal={addUserCloseModal} />
-              )}
-            </div>
+      
+         
 
             <div className="table--layout">
               {isLoading ? (
