@@ -312,21 +312,21 @@ export default function AllUsers() {
                       </th>
                       <th
                         className={
-                          option.stockName == 1
+                          option.stockSymbol == 1
                             ? "desc"
-                            : option.stockName == -1
+                            : option.stockSymbol == -1
                             ? "asc"
                             : ""
                         }
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOption({
-                            stockName: option.stockName == 1 ? -1 : 1,
+                            stockSymbol: option.stockSymbol == 1 ? -1 : 1,
                           });
                           setTableAction(false);
                         }}
                       >
-                        Stock Name
+                        Stock Symbol
                       </th>
 
                       <th
@@ -369,7 +369,7 @@ export default function AllUsers() {
                               {item.email}
                             </td>
                             <td onClick={() => setTableAction(false)}>
-                              {item.stockName}
+                              {item.stockSymbol}
                             </td>
 
                             <td onClick={() => setTableAction(false)}>
