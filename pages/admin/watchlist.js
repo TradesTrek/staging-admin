@@ -121,7 +121,7 @@ export default function AllUsers() {
                   <form>
                     <input
                       type="text"
-                      placeholder="Search by  stock name..."
+                      placeholder="Search by  stock symbol..."
                       onChange={(e) => handleSearch(e)}
                     />
                   </form>
