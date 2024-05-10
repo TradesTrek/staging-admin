@@ -247,7 +247,10 @@ export default function AllStock() {
                     name="holidayDate"
                     wrapperClassName="allStockDatepicker"
                     selected={selectedDate}
-                    onChange={setSelectedDate}
+                    onChange={(val, obj) => {
+                     if(!val) return
+                      setSelectedDate(val)
+                    }}
                     minDate={new Date(2023, 11, 22)}
                     maxDate={new Date()}
                     filterDate={isWeekday}
