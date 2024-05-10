@@ -60,7 +60,6 @@ const ExtraStockDetailsForm = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [board_of_directors, setBoard_of_directors] = useState([]);
-  const [sharesOutstandingValue, setSharesOutstandingValue] = useState();
   const [selectedExchange, setSelectedExchange] = useState("");
   const [selectedExchangeError, setSelectedExchangeError] = useState("");
   const [selectedSubSector, setSelectedSubSector] = useState("");
@@ -217,17 +216,13 @@ const ExtraStockDetailsForm = ({
         {...register("MarketClassification")}
       />
 
-      <NumberInput
-        label="Shares Outstanding"
-        placeholder="Enter number of shares outstanding"
-        {...register("SharesOutstanding")}
-        value={sharesOutstandingValue}
-        onChange={(val) => {
-          setValue("SharesOutstanding", val);
-          setSharesOutstandingValue(val);
-        }}
-        error={errors.SharesOutstanding?.message}
+<TextInput
+         label="Shares Outstanding"
+         placeholder="Enter number of shares outstanding"
+         {...register("SharesOutstanding")}
       />
+
+    
 
       <div className="mantine-InputWrapper-root mantine-TextInput-root mantine-1ejqehl">
         <div className="mantine-Input-wrapper mantine-TextInput-wrapper mantine-1v7s5f8">

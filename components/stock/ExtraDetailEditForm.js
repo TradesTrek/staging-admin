@@ -10,12 +10,13 @@ import { stockService } from "../../services/stock.service";
 import { toast, ToastContainer } from "react-toastify";
 import moment from "moment";
 
+
 const schema = yup.object({
   EmployeeCount: yup.string().notRequired(),
   Exchange: yup.string().required("Exchange is required"),
   Subsector: yup.string(),
   NatureOfBusiness: yup.string(),
-  SharesOutstanding: yup.number(),
+  SharesOutstanding: yup.string(),
   CompanyAddress: yup.string(),
   ContactEmail: yup.string().email("Invalid email format"),
   ContactNumber: yup.string(),
@@ -209,17 +210,10 @@ const ExtraStockDetailsEditForm = ({
         {...register("MarketClassification")}
       />
 
-      <NumberInput
-        label="Shares Outstanding"
-        placeholder="Enter number of shares outstanding"
-        {...register("SharesOutstanding")}
-        defaultValue={extraDetails.SharesOutstanding}
-        value={sharesOutstandingValue}
-        onChange={(val) => {
-          setValue("SharesOutstanding", val);
-          setSharesOutstandingValue(val);
-        }}
-        error={errors.SharesOutstanding?.message}
+<TextInput
+         label="Shares Outstanding"
+         placeholder="Enter number of shares outstanding"
+         {...register("SharesOutstanding")}
       />
 
       <div className="mantine-InputWrapper-root mantine-TextInput-root mantine-1ejqehl">
