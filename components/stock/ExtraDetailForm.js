@@ -26,7 +26,7 @@ const schema = yup.object({
   CompanySecretary: yup.string(),
   CEO: yup.string(),
   BoardChairperson: yup.string(),
-  // BoardOfDirectors: yup.array().of(yup.string()), // New field
+  BoardOfDirectors:  yup.string(), // New field
   FoundedDate: yup.date().nullable(), // Allow null for optional date
   DateListed: yup.date().nullable(),
   Website: yup.string().url("Invalid website URL (optional)"),
@@ -59,7 +59,6 @@ const ExtraStockDetailsForm = ({
   } = useForm({ resolver: yupResolver(schema) });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [board_of_directors, setBoard_of_directors] = useState([]);
   const [selectedExchange, setSelectedExchange] = useState("");
   const [selectedExchangeError, setSelectedExchangeError] = useState("");
   const [selectedSubSector, setSelectedSubSector] = useState("");
@@ -75,11 +74,6 @@ const ExtraStockDetailsForm = ({
       setSelectedExchangeError("")
     }
 
-    data.BoardOfDirectors =
-      board_of_directors.length > 0 ? board_of_directors : "";
-    data.SharesOutstanding = data.SharesOutstanding
-      ? Number(data.SharesOutstanding)
-      : "";
     data.Exchange = selectedExchange
 
     setIsLoading(true);

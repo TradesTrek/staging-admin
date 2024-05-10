@@ -25,7 +25,7 @@ const schema = yup.object({
   CompanySecretary: yup.string(),
   CEO: yup.string(),
   BoardChairperson: yup.string(),
-  // BoardOfDirectors: yup.array().of(yup.string()), // New field
+  BoardOfDirectors: yup.string(), 
   FoundedDate: yup.date().nullable(), // Allow null for optional date
   DateListed: yup.date().nullable(),
   Website: yup.string().url("Invalid website URL (optional)"),
@@ -65,12 +65,9 @@ const ExtraStockDetailsEditForm = ({
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [board_of_directors, setBoard_of_directors] = useState(extraDetails.BoardOfDirectors);
-  const [sharesOutstandingValue, setSharesOutstandingValue] = useState(extraDetails.SharesOutstanding);
-
+ 
   const onSubmit = async (data) => {
-    data.BoardOfDirectors =
-    board_of_directors.length > 0 ? board_of_directors : "";
+
     setIsLoading(true);
     try {
       const res = await stockService.updateExtraDetails(
@@ -173,13 +170,13 @@ const ExtraStockDetailsEditForm = ({
         placeholder="Enter CEO (optional)"
         {...register("CEO")}
       />
-      {/* <TagsInput
-        label="Board of directors"
-        placeholder="Press enter key to add a director "
-        data={[]}
-        value={board_of_directors}
-        onChange={setBoard_of_directors}
-      /> */}
+     
+
+     <TextInput
+        label="Board Of Directors (seperate name using comma)"
+        placeholder="Board Of Directors (optional)"
+        {...register("BoardOfDirectors")}
+      />
 
       <TextInput
         label="Legal Status"
