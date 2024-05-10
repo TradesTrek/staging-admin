@@ -171,6 +171,11 @@ const ExtraStockDetailsEditForm = ({
         {...register("CEO")}
       />
      
+     <TextInput
+        label="Board Chairperson"
+        placeholder="Enter board chairperson (optional)"
+        {...register("BoardChairperson")}
+      />
 
      <TextInput
         label="Board Of Directors (seperate name using comma)"

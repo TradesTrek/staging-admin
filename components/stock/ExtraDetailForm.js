@@ -172,14 +172,12 @@ const ExtraStockDetailsForm = ({
         placeholder="Enter board chairperson (optional)"
         {...register("BoardChairperson")}
       />
-      {/* 
-      <TagsInput
-        label="Board of directors"
-        placeholder="Press enter key to add a director "
-        data={[]}
-        value={board_of_directors}
-        onChange={setBoard_of_directors}
-      /> */}
+     
+     <TextInput
+        label="Board Of Directors (seperate name using comma)"
+        placeholder="Board Of Directors (optional)"
+        {...register("BoardOfDirectors")}
+      />
 
       <TextInput
         label="Legal Status"
