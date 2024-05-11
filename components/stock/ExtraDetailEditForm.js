@@ -10,7 +10,6 @@ import { stockService } from "../../services/stock.service";
 import { toast, ToastContainer } from "react-toastify";
 import moment from "moment";
 
-
 const schema = yup.object({
   EmployeeCount: yup.string().notRequired(),
   Exchange: yup.string().required("Exchange is required"),
@@ -25,7 +24,6 @@ const schema = yup.object({
   CompanySecretary: yup.string(),
   CEO: yup.string(),
   BoardChairperson: yup.string(),
-  BoardOfDirectors: yup.string(), 
   FoundedDate: yup.date().nullable(), // Allow null for optional date
   DateListed: yup.date().nullable(),
   Website: yup.string().url("Invalid website URL (optional)"),
@@ -65,9 +63,19 @@ const ExtraStockDetailsEditForm = ({
   });
 
   const [isLoading, setIsLoading] = useState(false);
- 
-  const onSubmit = async (data) => {
+  const [tags, setTags] = useState(extraDetails?.BoardOfDirectors || []); // State to store board member names
+  const handleAddTag = (newTag) => {
+    if (newTag && !tags.includes(newTag)) {
+      // Check for uniqueness and empty input
+      setTags([...tags, newTag]);
+    }
+  };
+  const handleDeleteTag = (tagToDelete) => {
+    setTags(tags.filter((tag) => tag !== tagToDelete));
+  };
 
+  const onSubmit = async (data) => {
+    data.BoardOfDirectors = tags;
     setIsLoading(true);
     try {
       const res = await stockService.updateExtraDetails(
@@ -170,17 +178,42 @@ const ExtraStockDetailsEditForm = ({
         placeholder="Enter CEO (optional)"
         {...register("CEO")}
       />
-     
-     <TextInput
+
+      <TextInput
         label="Board Chairperson"
         placeholder="Enter board chairperson (optional)"
         {...register("BoardChairperson")}
       />
 
-     <TextInput
-        label="Board Of Directors (seperate name using comma)"
-        placeholder="Board Of Directors (optional)"
-        {...register("BoardOfDirectors")}
+      <Autocomplete
+        multiple
+        style={{ marginTop: 10, marginBottom: 10 }}
+        id="tags-filled"
+        options={tags} // Set options to display existing tags for selection
+        freeSolo
+        value={tags} // Set value to control the selected tags
+        onChange={(event, newTags) => {
+          handleAddTag(newTags);
+        }} // Update state on selection change
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="filled"
+            label="Board of directors (optional)"
+            placeholder="Press Enter to add a new board member"
+          />
+        )}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((tag, index) => (
+            <Chip
+              key={index}
+              label={tag}
+              {...getTagProps({ index })}
+              onDelete={() => handleDeleteTag(tag)}
+              deleteIcon={"k"} // Optional: Customize delete icon
+            />
+          ))
+        }
       />
 
       <TextInput
@@ -212,10 +245,10 @@ const ExtraStockDetailsEditForm = ({
         {...register("MarketClassification")}
       />
 
-<TextInput
-         label="Shares Outstanding"
-         placeholder="Enter number of shares outstanding"
-         {...register("SharesOutstanding")}
+      <TextInput
+        label="Shares Outstanding"
+        placeholder="Enter number of shares outstanding"
+        {...register("SharesOutstanding")}
       />
 
       <div className="mantine-InputWrapper-root mantine-TextInput-root mantine-1ejqehl">

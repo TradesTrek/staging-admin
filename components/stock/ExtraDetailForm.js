@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { TextInput, NumberInput, Select } from "@mantine/core";
+import { TextInput, NumberInput, Select, } from "@mantine/core";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,6 +8,9 @@ import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import { stockService } from "../../services/stock.service";
 import { toast } from "react-toastify";
+import { Autocomplete, TextField, Chip } from '@mui/material';
+
+
 
 import {
   IconBrandInstagram,
@@ -26,7 +29,6 @@ const schema = yup.object({
   CompanySecretary: yup.string(),
   CEO: yup.string(),
   BoardChairperson: yup.string(),
-  BoardOfDirectors:  yup.string(), // New field
   FoundedDate: yup.date().nullable(), // Allow null for optional date
   DateListed: yup.date().nullable(),
   Website: yup.string().url("Invalid website URL (optional)"),
@@ -63,6 +65,16 @@ const ExtraStockDetailsForm = ({
   const [selectedExchangeError, setSelectedExchangeError] = useState("");
   const [selectedSubSector, setSelectedSubSector] = useState("");
 
+  const [tags, setTags] = useState([]); // State to store board member names
+  const handleAddTag = (newTag) => {
+    if (newTag && !tags.includes(newTag)) { // Check for uniqueness and empty input
+      setTags([...tags, newTag]);
+    }
+  };
+  const handleDeleteTag = (tagToDelete) => {
+    setTags(tags.filter((tag) => tag !== tagToDelete));
+  };
+
   const arrayOfExchanges = exchangesData.map((e) => e?.name);
 
   const onSubmit = async (data) => {
@@ -74,9 +86,14 @@ const ExtraStockDetailsForm = ({
       setSelectedExchangeError("")
     }
 
-    data.Exchange = selectedExchange
+    data.Exchange = selectedExchange;
 
+    if(tags.length){
+      data.BoardOfDirectors = tags
+    }
+    
     setIsLoading(true);
+
     try {
       const res = await stockService.addExtraDetails(
         selectedStock.Symbol,
@@ -95,8 +112,10 @@ const ExtraStockDetailsForm = ({
     }
   };
 
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      
       <TextInput label="Name" placeholder={selectedStock.Name} disabled />
 
       <TextInput
@@ -173,11 +192,39 @@ const ExtraStockDetailsForm = ({
         {...register("BoardChairperson")}
       />
      
-     <TextInput
-        label="Board Of Directors (seperate name using comma)"
-        placeholder="Board Of Directors (optional)"
-        {...register("BoardOfDirectors")}
-      />
+
+   <Autocomplete
+      style={{ marginTop: 10, marginBottom: 10}}
+      multiple
+      id="tags-filled"
+      options={tags} // Set options to display existing tags for selection
+      freeSolo
+      value={tags} // Set value to control the selected tags
+      onChange={(event, newTags) => {
+        handleAddTag(newTags)
+      }} // Update state on selection change
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="filled"
+          label="Board of directors (optional)"
+          placeholder="Press Enter to add a new board member"
+         
+        />
+      )}
+      renderTags={(tagValue, getTagProps) =>
+        tagValue.map((tag, index) => (
+          <Chip
+            key={index}
+            label={tag}
+            {...getTagProps({ index })}
+            onDelete={() => handleDeleteTag(tag)}
+            deleteIcon={ 'k'} // Optional: Customize delete icon
+          />
+        ))
+      }
+    />
+
 
       <TextInput
         label="Legal Status"
