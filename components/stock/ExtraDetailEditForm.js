@@ -9,8 +9,13 @@ import Button from "@mui/material/Button";
 import { stockService } from "../../services/stock.service";
 import { toast, ToastContainer } from "react-toastify";
 import moment from "moment";
-import { Autocomplete, TextField, Chip } from '@mui/material';
+import { Autocomplete, TextField, Chip } from "@mui/material";
 
+import {
+  IconBrandInstagram,
+  IconBrandTwitter,
+  IconBrandFacebook,
+} from "@tabler/icons-react";
 
 const schema = yup.object({
   EmployeeCount: yup.string().notRequired(),
@@ -29,6 +34,9 @@ const schema = yup.object({
   FoundedDate: yup.date().nullable(), // Allow null for optional date
   DateListed: yup.date().nullable(),
   Website: yup.string().url("Invalid website URL (optional)"),
+  Twitter: yup.string().url("Invalid  URL (optional)"),
+  Facebook: yup.string().url("Invalid  URL (optional)"),
+  Instagram: yup.string().url("Invalid URL (optional)"),
   LegalStatus: yup.string(),
   RegulatoryBody: yup.string(),
   PatentsOwned: yup.string(),
@@ -42,6 +50,8 @@ const ExtraStockDetailsEditForm = ({
   setRefetchCounter,
   closeVerticalDots,
   extraDetails,
+  exchangesData,
+  subSectorData,
 }) => {
   const defaultValues = {
     ...extraDetails,
@@ -52,6 +62,8 @@ const ExtraStockDetailsEditForm = ({
       ? moment(extraDetails.DateListed).toDate()
       : null,
   };
+
+  const arrayOfExchanges = exchangesData.map((e) => e?.name);
 
   const {
     control,
@@ -65,6 +77,14 @@ const ExtraStockDetailsEditForm = ({
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedExchange, setSelectedExchange] = useState(
+    defaultValues?.Exchange || ""
+  );
+  const [selectedExchangeError, setSelectedExchangeError] = useState("");
+  const [selectedSubSector, setSelectedSubSector] = useState(
+    defaultValues?.Subsector || ""
+  );
+
   const [tags, setTags] = useState(extraDetails?.BoardOfDirectors || []); // State to store board member names
   const handleAddTag = (newTag) => {
     if (newTag && !tags.includes(newTag)) {
@@ -120,23 +140,25 @@ const ExtraStockDetailsEditForm = ({
         error={errors.Description?.message}
       />
 
-      <TextInput
+      <Select
+        value={selectedExchange}
+        onChange={setSelectedExchange}
         label="Exchange"
         placeholder="Enter stock exchange (e.g., NASDAQ)"
-        {...register("Exchange", { required: true })}
-        error={errors.Exchange?.message}
-      />
-      <TextInput
-        label="Subsector"
-        placeholder="Enter subsector (optional)"
-        {...register("Subsector")}
+        data={arrayOfExchanges}
+        clearable
+        error={selectedExchangeError}
       />
 
-      <TextInput
-        label="EmployeeCount"
-        placeholder="Enter Employee Count (optional)"
-        {...register("EmployeeCount")}
+      <Select
+        value={selectedSubSector}
+        onChange={setSelectedSubSector}
+        label="Subsector"
+        placeholder="Enter subsector (optional)"
+        data={subSectorData.map((e) => e.name)}
+        clearable
       />
+
 
       <TextInput
         label="Nature of Business"
@@ -229,6 +251,7 @@ const ExtraStockDetailsEditForm = ({
         placeholder="Enter Regulatory Body (optional)"
         {...register("RegulatoryBody")}
       />
+
       <TextInput
         label="EmployeeCount"
         placeholder="Enter Employee Count (optional)"
@@ -307,6 +330,31 @@ const ExtraStockDetailsEditForm = ({
         {...register("Website")}
         error={errors.Website?.message}
       />
+
+<TextInput
+        leftSection={<IconBrandInstagram size={16} />}
+        label="Instagram"
+        placeholder="Enter Instagram link (optional)"
+        {...register("Instagram")}
+        error={errors.Instagram?.message}
+      />
+
+      <TextInput
+        leftSection={<IconBrandFacebook size={16} />}
+        label="Facebook"
+        placeholder="Enter Facebook Link (optional)"
+        {...register("Facebook")}
+        error={errors.Facebook?.message}
+      />
+
+      <TextInput
+        leftSection={<IconBrandTwitter size={16} />}
+        label="Twitter"
+        placeholder="Enter Twitter URL (optional)"
+        {...register("Twitter")}
+        error={errors.Twitter?.message}
+      />
+
 
       <Button
         style={{ margin: "10px auto", display: "block" }}
