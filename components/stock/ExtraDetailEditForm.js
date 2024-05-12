@@ -87,9 +87,9 @@ const ExtraStockDetailsEditForm = ({
 
   const [tags, setTags] = useState(extraDetails?.BoardOfDirectors || []); // State to store board member names
   const handleAddTag = (newTag) => {
-    if (newTag && !tags.includes(newTag)) {
-      // Check for uniqueness and empty input
-      setTags([...tags, newTag]);
+    if (newTag && !tags.includes(newTag)) { // Check for uniqueness and empty input
+      const newState = [...tags, newTag]
+      setTags(newState);
     }
   };
   const handleDeleteTag = (tagToDelete) => {
@@ -209,36 +209,39 @@ const ExtraStockDetailsEditForm = ({
         {...register("BoardChairperson")}
       />
 
-      <Autocomplete
-        multiple
-        style={{ marginTop: 10, marginBottom: 10 }}
-        id="tags-filled"
-        options={tags} // Set options to display existing tags for selection
-        freeSolo
-        value={tags} // Set value to control the selected tags
-        onChange={(event, newTags) => {
-          handleAddTag(newTags);
-        }} // Update state on selection change
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="filled"
-            label="Board of directors (optional)"
-            placeholder="Press Enter to add a new board member"
+<Autocomplete
+      style={{ marginTop: 10, marginBottom: 10}}
+      multiple
+      id="tags-filled"
+      options={tags} // Set options to display existing tags for selection
+      freeSolo
+      value={tags} // Set value to control the selected tags
+      onChange={(event, newTags) => {
+        handleAddTag(event.target.value)
+      }} // Update state on selection change
+      getOptionLabel={(option) => option}
+
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="filled"
+          label="Board of directors (optional)"
+          placeholder="Press Enter to add a new board member"
+         
+        />
+      )}
+      renderTags={(tagValue, getTagProps) =>
+        tagValue.map((tag, index) => (
+          <Chip
+            key={index}
+            label={tag}
+            {...getTagProps({ index })}
+            onDelete={() => handleDeleteTag(tag)}
+            deleteIcon={ 'k'} // Optional: Customize delete icon
           />
-        )}
-        renderTags={(tagValue, getTagProps) =>
-          tagValue.map((tag, index) => (
-            <Chip
-              key={index}
-              label={tag}
-              {...getTagProps({ index })}
-              onDelete={() => handleDeleteTag(tag)}
-              deleteIcon={"k"} // Optional: Customize delete icon
-            />
-          ))
-        }
-      />
+        ))
+      }
+    />
 
       <TextInput
         label="Legal Status"

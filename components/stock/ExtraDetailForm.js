@@ -68,8 +68,6 @@ const ExtraStockDetailsForm = ({
   const [tags, setTags] = useState([]); // State to store board member names
   const handleAddTag = (newTag) => {
     if (newTag && !tags.includes(newTag)) { // Check for uniqueness and empty input
-
-      console.log(newTag, '>>>>', tags)
       const newState = [...tags, newTag]
       setTags(newState);
     }
