@@ -87,14 +87,18 @@ const ExtraStockDetailsForm = ({
       setSelectedExchangeError("")
     }
 
+    setIsLoading(true);
+
     data.Exchange = selectedExchange;
+    
+    if(selectedSubSector){
+      data.Subsector =  selectedSubSector
+    }
 
     if(tags.length){
       data.BoardOfDirectors = tags
     }
     
-    setIsLoading(true);
-
     try {
       const res = await stockService.addExtraDetails(
         selectedStock.Symbol,
