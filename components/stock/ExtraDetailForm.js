@@ -68,7 +68,10 @@ const ExtraStockDetailsForm = ({
   const [tags, setTags] = useState([]); // State to store board member names
   const handleAddTag = (newTag) => {
     if (newTag && !tags.includes(newTag)) { // Check for uniqueness and empty input
-      setTags([...tags, newTag]);
+
+      console.log(newTag, '>>>>', tags)
+      const newState = [...tags, newTag]
+      setTags(newState);
     }
   };
   const handleDeleteTag = (tagToDelete) => {
@@ -201,8 +204,10 @@ const ExtraStockDetailsForm = ({
       freeSolo
       value={tags} // Set value to control the selected tags
       onChange={(event, newTags) => {
-        handleAddTag(newTags)
+        handleAddTag(event.target.value)
       }} // Update state on selection change
+      getOptionLabel={(option) => option}
+
       renderInput={(params) => (
         <TextField
           {...params}
