@@ -62,27 +62,13 @@ export default function AddSector({ addUserCloseModal }) {
 
   // Save value in state
   const handleChange = (e) => {
-    if (e.target) {
       const { name, value } = e.target;
-      if (name == "category" && value.length <= 20) {
+      if (name == "category") {
         setFormValues({ ...formValues, [name]: value });
         setFormErrors(validate(formValues));
         setFormErrors({ ...formErrors, [name]: "" });
-      } else if (name == "holidayName") {
-        setFormErrors({
-          ...formErrors,
-          [name]: "Holiday Name is maximum 20 characters.",
-        });
+      
       }
-   
-    } else {
-      setFormValues({
-        ...formValues,
-        holidayDate: moment(e).format("YYYY-MM-DD"),
-      });
-      setFormErrors(validate(formValues));
-      setFormErrors({ ...formErrors, holidayDate: "" });
-    }
   };
 
   // Form validation
@@ -91,8 +77,6 @@ export default function AddSector({ addUserCloseModal }) {
     if (!values.category) {
       errors.category = "name is required.";
     }
-  
-
     return errors;
   };
   const isWeekday = (date) => {

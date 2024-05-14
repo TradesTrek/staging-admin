@@ -440,16 +440,17 @@ export default function AllUsers() {
                                   </a>
                                 </Link>
 
-                                {/* <Link href="javascript:void(0)">
+                                <Link href="javascript:void(0)">
                                   <a
                                     className="edit__detail"
                                     onClick={() => {
-                                      setEditUserForm(true), setUserData(item);
+                                      setEditUserForm(true);
+                                      setUserData(item);
                                     }}
                                   >
                                     Edit Sector
                                   </a>
-                                </Link> */}
+                                </Link>
                               </span>
                             ) : (
                               " "
