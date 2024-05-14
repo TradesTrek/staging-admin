@@ -11,7 +11,7 @@ const userSubject = new BehaviorSubject(
 
 function getAllStockSectors() {
   return fetchWrapper
-    .get(`${baseUrl}/stock/sectors`)
+    .get(`${baseUrl}/stock/sectors-v2`)
 
     .then((res) => {
       if (res.success) {
