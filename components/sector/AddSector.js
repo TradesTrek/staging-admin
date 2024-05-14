@@ -3,9 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { FormSpinner } from "../Spinners/FormSpinner";
 import getConfig from "next/config";
-import NigerianCurrentTimeZone from "../../helpers/NegerianCurrentTime";
 import "react-datepicker/dist/react-datepicker.css";
-import ReactDatePicker from "react-datepicker";
 import moment from "moment";
 import { stockService } from "../../services/stock.service";
 

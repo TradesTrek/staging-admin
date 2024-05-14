@@ -170,6 +170,17 @@ function StocksNotSuspended() {
       });
   }
 
+  function updateSectorName(body) {
+    return fetchWrapper
+      .put(`${baseUrl}/stock/updateSectorName`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
+
   function addSector(body) {
     return fetchWrapper
       .post(`${baseUrl}/stock/addSector`, body)
@@ -261,6 +272,7 @@ function StocksNotSuspended() {
     updateApplySectorToStock,
     deleteExchange,
     deleteSubSector,
-    deleteSector
+    deleteSector,
+    updateSectorName
   };
   

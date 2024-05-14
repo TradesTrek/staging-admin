@@ -3,12 +3,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { FormSpinner } from "../Spinners/FormSpinner";
 import getConfig from "next/config";
-import { userService } from "../../services";
-import NigerianCurrentTimeZone from "../../helpers/NegerianCurrentTime";
 
 import "react-datepicker/dist/react-datepicker.css";
-import ReactDatePicker from "react-datepicker";
-import moment from "moment";
+import { stockService } from "../../services/stock.service";
+
 export default function EditSector(props) {
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}`;
@@ -48,8 +46,8 @@ export default function EditSector(props) {
     };
 
 
-    data._id = props?.data?._id;
-    const response = await userService.updateHoliday(data);
+    data.sectorId = props?.data?._id;
+    const response = await stockService.updateSectorName(data);
     if (response.success) {
       toast.success(response.message, {
         position: toast.POSITION.TOP_RIGHT,
