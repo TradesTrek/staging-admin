@@ -39,7 +39,7 @@ function StocksNotSuspended() {
 
   function getStockSector(stock){
     return fetchWrapper
-    .get(`${baseUrl}/stock/sector?stockSymbol=${stock}`)
+    .get(`${baseUrl}/stock/sector?stockId=${stock}`)
     .then((res) => {
       return res;
     })
@@ -70,6 +70,16 @@ function StocksNotSuspended() {
     });
   }
 
+  function deleteSector(sectorId){
+    return fetchWrapper
+    .delete(`${baseUrl}/stock/sector?sectorId=${sectorId}`)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+  }
   function deleteSubSector(subsectorId){
     return fetchWrapper
     .delete(`${baseUrl}/admin/stock/subsector/${subsectorId}`)
@@ -138,7 +148,38 @@ function StocksNotSuspended() {
       });
   }
 
+  function updateApplySectorToStock(body){
+    return fetchWrapper
+      .put(`${baseUrl}/stock/applySectorToStock`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
 
+  function applySectorToStock(body) {
+    return fetchWrapper
+      .post(`${baseUrl}/stock/applySectorToStock`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
+
+  function addSector(body) {
+    return fetchWrapper
+      .post(`${baseUrl}/stock/addSector`, body)
+      .then((res) => {
+        return res;
+      })
+      .catch(function (error) {
+        return error;
+      });
+  }
   function addSubSectors(body) {
     return fetchWrapper
       .post(`${baseUrl}/admin/stock/subsector`, body)
@@ -215,7 +256,11 @@ function StocksNotSuspended() {
     getExchange,
     getSubSectors,
     addSubSectors,
+    addSector,
+    applySectorToStock,
+    updateApplySectorToStock,
     deleteExchange,
-    deleteSubSector
+    deleteSubSector,
+    deleteSector
   };
   

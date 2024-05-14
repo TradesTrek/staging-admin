@@ -341,8 +341,13 @@ export default function SideBar() {
                   </Link>
                 </li>
                 <li className={rout === 'users' ? 'active' : ''}>
-                  <Link href="/admin/stock-sectors">
+                  <Link href="/admin/all-sectors">
                     <a>Sectors</a>
+                  </Link>
+                </li>
+                <li className={rout === 'users' ? 'active' : ''}>
+                  <Link href="/admin/stock-sectors">
+                    <a>Apply Sector to stock</a>
                   </Link>
                 </li>
                 <li className={rout === 'users' ? 'active' : ''}>

@@ -17,7 +17,9 @@ export default function Sectors() {
   const [allSectors, setAllSector] = useState([]);
   const [isAddLoading, setIsAddLoading] = useState("");
   const [isEditModal, setIsEditModal] = useState(false);
-
+  const [stockData, setStockData] = useState([]);
+  const [refetch, setRefetch] = useState(0);
+  
   useEffect(() => {
     stockService
       .StocksNotSuspended()
@@ -25,6 +27,7 @@ export default function Sectors() {
         if (res.success) {
           const arrayOfSymbols = res.data.map((e) => e.Symbol);
           setStocks(arrayOfSymbols);
+          setStockData(res.data);
         }
         setIsLoading(false);
       })
@@ -49,8 +52,12 @@ export default function Sectors() {
 
   useEffect(() => {
     if (!selectedStock) return;
+    const selectedData = stockData.filter((e) => e.Symbol === selectedStock);
+    if (!selectedData.length) return;
+    const selectedObject = selectedData[0];
+
     stockService
-      .getStockSector(selectedStock)
+      .getStockSector(selectedObject._id)
       .then((res) => {
         if (res.success) {
           setSector(res.data);
@@ -60,20 +67,37 @@ export default function Sectors() {
       .catch((err) => {
         setIsLoading(false);
       });
-  }, [selectedStock]);
+  }, [selectedStock, refetch]);
 
+ 
   const addStockToSector = async () => {
     try {
       setIsAddLoading(true);
-      await stockService.addStockToSector({
-        category: selectedSector,
-        symbol: selectedStock,
+      if (!selectedStock) return;
+      const selectedData = stockData.filter((e) => e.Symbol === selectedStock);
+      if (!selectedData.length) return;
+      const selectedObject = selectedData[0];
+     const response = await stockService.applySectorToStock({
+        stockId: selectedObject._id,
+        sectorId: selectedSector,
+
       });
-      
-      setSelectedSector("");
-      toast.success("Added successfuly");
-      close();
-      setIsAddLoading(false);
+
+      if(response.success){
+        setSelectedSector("");
+        toast.success("Added successfuly");
+        setRefetch(refetch + 1)
+        close();
+        setIsAddLoading(false);
+      }else{
+        setIsAddLoading(false);
+        toast.error(response.message);
+
+        close();
+       setSelectedSector("");
+      }
+
+  
     } catch (error) {
       setIsAddLoading(false);
       toast.error(error.message);
@@ -83,16 +107,18 @@ export default function Sectors() {
   const updateSector = async () => {
     try {
       setIsAddLoading(true);
-      await stockService.updateStockToSector({
-        newCategory: selectedSector,
-        stockSymbol: selectedStock,
+      if (!selectedStock) return;
+      const selectedData = stockData.filter((e) => e.Symbol === selectedStock);
+      if (!selectedData.length) return;
+      const selectedObject = selectedData[0];
+      await stockService.updateApplySectorToStock({
+        stockId: selectedObject._id,
+        sectorId: selectedSector,
       });
-      setSelectedStock("")
-      setSelectedSector("");
-      setSector({});
+      setRefetch(refetch + 1)
+    
       toast.success("Updated successfuly");
-      
-      
+    
       close();
       setIsAddLoading(false);
     } catch (error) {
@@ -123,7 +149,7 @@ export default function Sectors() {
               variant="filled"
               onClick={() => {
                 setIsEditModal(true);
-                setSelectedSector(sector?.category);
+                setSelectedSector(sector?._id);
                 open();
               }}
               style={{ background: "indigo" }}
@@ -151,7 +177,6 @@ export default function Sectors() {
     }
   };
 
- 
   return (
     <>
       <Head>
@@ -170,16 +195,16 @@ export default function Sectors() {
         <Stack>
           {allSectors.map((e, i) => (
             <Checkbox
-              checked={e === selectedSector}
+              checked={e._id === selectedSector}
               key={i}
               onChange={() => {
-                if (e === selectedSector) {
+                if (e._id === selectedSector) {
                   setSelectedSector("");
                 } else {
-                  setSelectedSector(e);
+                  setSelectedSector(e._id);
                 }
               }}
-              label={e}
+              label={e.category}
             />
           ))}
 
