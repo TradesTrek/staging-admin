@@ -48,10 +48,11 @@ export default function AllTransaction() {
       label: "Username",
       key: "username",
     },
-    { label: "App Feature", key: "appFeature" },
-    { label: "User Action", key: "userAction" },
+    { label: "FirstName", key: "firstName" },
+    { label: "lastName", key: "lastName" },
     { label: "Status", key: "status" },
-    {label:"Timestamp", key: "createdAt"},
+    {label:"Activation Date", key: "activationDate"},
+    {label:"Expiry Date", key: "expireDate"},
   ];
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function AllTransaction() {
       .getGiftedUsers(search, data, page)
       .then((res) => {
         if (res.success) {
-          console.log(res)
+
           setTransactionList(res.data);
 
           setTotalPage(res.data.pages);
@@ -74,7 +75,6 @@ export default function AllTransaction() {
       })
       .catch((err) => {
         setIsLoading(false);
-        console.log(err);
       });
   };
 
@@ -92,8 +92,6 @@ export default function AllTransaction() {
       .catch((err) => {
         setIsLoading(false);
         setModelOpened(false);
-
-        console.log(err);
       });
   };
 
@@ -102,22 +100,21 @@ export default function AllTransaction() {
     getLogs(search, option, selected + 1);
   };
   const downloadUserLogs = async (str) => {
-    const option = { download: true };
+
     try {
-      const { data } = await userService.getUserLogs(search, option, 1);
-      const { success } = data;
+      const { data } = await userService.getGiftedUsers(search, data, page);
+    
 
-      if (success) {
-
-        if(!data?.data.length){
+   
+        if(!data.length){
           alert('No record avalaible for download')
           return
         }
 
-        ExportExcel(TransactionHeaders, data.data, "User Logs");
+        ExportExcel(TransactionHeaders, transactionList, "Gifted users");
         setXlsxDownloading(false);
         return
-      }
+      
       alert('Download failed')
     } catch (err) {
       setXlsxDownloading(false);
@@ -490,7 +487,7 @@ export default function AllTransaction() {
                     {transactionList &&
                       transactionList.length > 0 &&
                       transactionList.map((item, i) => {
-                        console.log(item)
+          
                         return (
                           <tr key={i}>
                             <td>{(currentPage - 1) * 10 + i + 1}</td>
