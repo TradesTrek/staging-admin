@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 import { stockService } from "../../services/stock.service";
 import { toast } from "react-toastify";
 import { Autocomplete, TextField, Chip } from '@mui/material';
-
+import Tiptap from './TipTapRichText.js'
 
 
 import {
@@ -40,7 +40,7 @@ const schema = yup.object({
   PatentsOwned: yup.string(),
   LogoURL: yup.string().url("Invalid logo URL (optional)"),
   EmployeeCount: yup.string(),
-  Description: yup.string().required("Description is required"),
+  // Description: yup.string().required("Description is required"),
 });
 
 const ExtraStockDetailsForm = ({
@@ -64,6 +64,7 @@ const ExtraStockDetailsForm = ({
   const [selectedExchange, setSelectedExchange] = useState("");
   const [selectedExchangeError, setSelectedExchangeError] = useState("");
   const [selectedSubSector, setSelectedSubSector] = useState("");
+  const [stringifiedDescription, setStringifiedDescription] = useState("");
 
   const [tags, setTags] = useState([]); // State to store board member names
   const handleAddTag = (newTag) => {
@@ -90,6 +91,7 @@ const ExtraStockDetailsForm = ({
     setIsLoading(true);
 
     data.Exchange = selectedExchange;
+    data.Description = stringifiedDescription
     
     if(selectedSubSector){
       data.Subsector =  selectedSubSector
@@ -121,14 +123,11 @@ const ExtraStockDetailsForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       
+    
       <TextInput label="Name" placeholder={selectedStock.Name} disabled />
 
-      <TextInput
-        label="Description"
-        placeholder="Enter Description"
-        {...register("Description", { required: true })}
-        error={errors.Description?.message}
-      />
+      <Tiptap type='create' data='' setStringifiedDescription={setStringifiedDescription} />
+     
 
       <Select
         value={selectedExchange}

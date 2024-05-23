@@ -10,7 +10,7 @@ import { stockService } from "../../services/stock.service";
 import { toast, ToastContainer } from "react-toastify";
 import moment from "moment";
 import { Autocomplete, TextField, Chip } from "@mui/material";
-
+import Tiptap from "./TipTapRichText.js";
 import {
   IconBrandInstagram,
   IconBrandTwitter,
@@ -41,7 +41,7 @@ const schema = yup.object({
   RegulatoryBody: yup.string(),
   PatentsOwned: yup.string(),
   LogoURL: yup.string().url("Invalid logo URL (optional)"),
-  Description: yup.string().required("Description is required"),
+  // Description: yup.string().required("Description is required"),
 });
 
 const ExtraStockDetailsEditForm = ({
@@ -76,6 +76,11 @@ const ExtraStockDetailsEditForm = ({
     defaultValues,
   });
 
+  useEffect(() => {
+    if (extraDetails.Description) {
+      setStringifiedDescription(extraDetails.Description);
+    }
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState(
     defaultValues?.Exchange || ""
@@ -84,6 +89,7 @@ const ExtraStockDetailsEditForm = ({
   const [selectedSubSector, setSelectedSubSector] = useState(
     defaultValues?.Subsector || ""
   );
+  const [stringifiedDescription, setStringifiedDescription] = useState("");
 
   const [tags, setTags] = useState(extraDetails?.BoardOfDirectors || []); // State to store board member names
   const handleAddTag = (newTag) => {
@@ -101,9 +107,10 @@ const ExtraStockDetailsEditForm = ({
     setIsLoading(true);
     data.BoardOfDirectors = tags;
     data.Exchange = selectedExchange;
-    
-    if(selectedSubSector){
-      data.Subsector =  selectedSubSector
+    data.Description = stringifiedDescription;
+
+    if (selectedSubSector) {
+      data.Subsector = selectedSubSector;
     }
 
     try {
@@ -139,12 +146,12 @@ const ExtraStockDetailsEditForm = ({
       />
 
       <TextInput label="Name" placeholder={selectedStock.Name} disabled />
-
-      <TextInput
-        label="Description"
-        placeholder="Enter Description"
-        {...register("Description", { required: true })}
-        error={errors.Description?.message}
+      <Tiptap
+        data={
+          extraDetails.Description ? JSON.parse(extraDetails.Description) : ""
+        }
+        setStringifiedDescription={setStringifiedDescription}
+        type="edit"
       />
 
       <Select
