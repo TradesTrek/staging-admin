@@ -45,6 +45,7 @@ export default function AllUsers() {
     { label: "Stock Symbol", key: "stockSymbol" },
     { label: "Stock Name:", key: "stockName" },
     { label: "Created Date", key: "createdAt" },
+    { label: "Time of price alert", key: "updatedAt" },
   ];
 
   useEffect(() => {
@@ -215,6 +216,24 @@ export default function AllUsers() {
                       </th>
                       <th
                         className={
+                          option.userId == 1
+                            ? "desc"
+                            : option.userId == -1
+                            ? "asc"
+                            : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOption({
+                            userId: option.userId == 1 ? -1 : 1,
+                          });
+                          setTableAction(false);
+                        }}
+                      >
+                        User Id
+                      </th>
+                      <th
+                        className={
                           option.email == 1
                             ? "desc"
                             : option.email == -1
@@ -269,6 +288,7 @@ export default function AllUsers() {
                         Created Date
                       </th>
 
+
                       <th
                         onClick={() => setTableAction(false)}
                         style={{ width: "4rem" }}
@@ -287,6 +307,9 @@ export default function AllUsers() {
                               {/* <input type="checkbox" /> */}
                             </td>
                             <td onClick={() => setTableAction(false)}>
+                              {item.userId}
+                            </td>
+                            <td onClick={() => setTableAction(false)}>
                               {item.email}
                             </td>
                             <td onClick={() => setTableAction(false)}>
@@ -297,6 +320,9 @@ export default function AllUsers() {
                               {moment(item.createdAt).format("lll")}
                             </td>
 
+                            <td onClick={() => setTableAction(false)}>
+                              {moment(item.updatedAt).format("lll")}
+                            </td>
                             <td></td>
                           </tr>
                         );
