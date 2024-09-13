@@ -542,7 +542,7 @@ export default function SideBar() {
             </span>{' '}
             {openMenu9 && (
               <ul className="sub__navMenu">
-              <li className={rout === 'learning-list' ? 'active' : ''}>
+              <li className={rout === 'category-list' ? 'active' : ''}>
                   <Link href="/admin/category-list">
                     <a>Category List</a>
                   </Link>
@@ -551,6 +551,18 @@ export default function SideBar() {
                 <li className={rout === 'learning-list' ? 'active' : ''}>
                   <Link href="/admin/learning-list">
                     <a>Learning List</a>
+                  </Link>
+                </li>
+
+                <li className={rout === 'group-learning-module' ? 'active' : ''}>
+                  <Link href="/admin/group-learning-module">
+                    <a>Grouping Learning module</a>
+                  </Link>
+                </li>
+
+                <li className={rout === 'learning-module' ? 'active' : ''}>
+                  <Link href="/admin/learning-module">
+                    <a>Learning module</a>
                   </Link>
                 </li>
               </ul>

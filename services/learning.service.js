@@ -110,6 +110,52 @@ function AddLearning(data) {
     });
 }
 
+
+function AddQuizModule(data) {
+  return fetchWrapper
+    .post(`${baseUrl}/learning-quiz-module/add-quiz`,data)
+    .then((res) => {
+     return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function GetLearningModule() {
+  return fetchWrapper
+    .get(`${baseUrl}/learning-quiz-module`)
+    .then((res) => {
+     return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function deleteLearningModule(id) {
+  return fetchWrapper
+    .delete(`${baseUrl}/learning-quiz-module/${id}`)
+    .then((res) => {
+     return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
+function toggleLearningModuleAbility(id) {
+  return fetchWrapper
+    .put(`${baseUrl}/learning-quiz-module/${id}/toggle-disable`)
+    .then((res) => {
+     return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
 function EditLearning(data,id) {
   return fetchWrapper
     .post(`${baseUrl}/learning/edit-learning?learningId=${id}`,data)
@@ -121,11 +167,55 @@ function EditLearning(data,id) {
     });
 }
 
+
+
+function UpdateQuizModule(id,data) {
+  return fetchWrapper
+    .put(`${baseUrl}/learning-quiz-module/${id}`,data)
+    .then((res) => {
+     return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
 function DeleteLearning(id) {
   return fetchWrapper
     .delete(`${baseUrl}/learning/delete-learning?learningId=${id}`)
     .then((res) => {
      return res     
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function getLearningModuleGroups() {
+  return fetchWrapper.get(`${baseUrl}/learning-module-groups`)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function createLearningModuleGroup(data) {
+  return fetchWrapper.post(`${baseUrl}/learning-module-groups`, data)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+function deleteLearningModuleGroup(id) {
+  return fetchWrapper.delete(`${baseUrl}/learning-module-groups/${id}`)
+    .then((res) => {
+      return res;
     })
     .catch(function (error) {
       return error;
@@ -147,5 +237,13 @@ export const learningService = {
   AllLearning,
   EditLearning,
   DeleteLearning,
-  EnableDisableCategory
+  EnableDisableCategory,
+  AddQuizModule,
+  GetLearningModule,
+  deleteLearningModule,
+  toggleLearningModuleAbility,
+  UpdateQuizModule,
+  deleteLearningModuleGroup,
+  createLearningModuleGroup,
+  getLearningModuleGroups
 };
