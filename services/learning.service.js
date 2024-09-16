@@ -222,6 +222,26 @@ function deleteLearningModuleGroup(id) {
     });
 }
 
+function reorderLearningModuleGroups(reorderDto) {
+  return fetchWrapper.put(`${baseUrl}/learning-module-groups/reorder`, reorderDto)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
+
+
+function reorderLearningModules(reorderDto) {
+  return fetchWrapper.put(`${baseUrl}/learning-quiz-module/reorder`, reorderDto)
+    .then((res) => {
+      return res;
+    })
+    .catch(function (error) {
+      return error;
+    });
+}
 
 export const learningService = {
   user: userSubject.asObservable(),
@@ -245,5 +265,7 @@ export const learningService = {
   UpdateQuizModule,
   deleteLearningModuleGroup,
   createLearningModuleGroup,
-  getLearningModuleGroups
+  getLearningModuleGroups,
+  reorderLearningModuleGroups,
+  reorderLearningModules
 };

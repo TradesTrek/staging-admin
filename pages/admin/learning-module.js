@@ -12,14 +12,7 @@ import { toast } from "react-toastify";
 import FormSpinner from "../../components/Spinners/FormSpinner";
 import { learningService } from "../../services/learning.service";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  Modal,
-  Button,
-  Container,
-  Paper,
-  RadioGroup,
-  Radio,
-} from "@mantine/core";
+import { Modal } from "@mantine/core";
 import { EditorState, convertFromRaw } from "draft-js";
 import dynamic from "next/dynamic";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -28,15 +21,6 @@ const DynamicEditor = dynamic(
   () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
   { ssr: false }
 );
-
-const getItems = (learningModules) => learningModules.map((e) => ({ ...e }));
-
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
-};
 
 const buttonStyle = {
   padding: "8px 12px",
@@ -81,6 +65,7 @@ const Learn = ({ learningModules, toggleEditForm }) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [selectItem, setSelectItem] = useState({});
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [isReordering, setIsReordering] = useState(false);
 
   useEffect(() => {
     if (selectItem && selectItem.content) {
@@ -94,27 +79,47 @@ const Learn = ({ learningModules, toggleEditForm }) => {
     }
   }, [selectItem]);
 
+  const reorderModules = async (groupId, sourceIndex, destinationIndex) => {
+    try {
+      const response = await learningService.reorderLearningModules({
+        group: groupId,
+        sourceIndex,
+        destinationIndex
+      });
+      if (response.success) {
+        setItems(prevItems => {
+          const newItems = [...prevItems];
+          const groupIndex = newItems.findIndex(item => item.group._id === groupId);
+          if (groupIndex !== -1) {
+            newItems[groupIndex].modules = response.data;
+          }
+          return newItems;
+        });
+        toast.success("Modules reordered successfully");
+      } else {
+        toast.error("Failed to reorder modules");
+      }
+      setIsReordering(false);
+    } catch (error) {
+      setIsReordering(false);
+      toast.error("An error occurred while reordering modules");
+    }
+  };
+
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    const newItems = [...items];
-
-    // Find the source and destination groups
-    const sourceGroupIndex = newItems.findIndex(item => item.group._id === source.droppableId);
-    const destGroupIndex = newItems.findIndex(item => item.group._id === destination.droppableId);
-
-    if (sourceGroupIndex === destGroupIndex) {
-      // Moving within the same group
-      const [reorderedItem] = newItems[sourceGroupIndex].modules.splice(source.index, 1);
-      newItems[sourceGroupIndex].modules.splice(destination.index, 0, reorderedItem);
+    
+    if (source.droppableId === destination.droppableId) {
+      setIsReordering(true);
+      // Reordering within the same group
+      const groupId = source.droppableId;
+      reorderModules(groupId, source.index, destination.index);
     } else {
-      // Moving between groups
-      const [movedItem] = newItems[sourceGroupIndex].modules.splice(source.index, 1);
-      newItems[destGroupIndex].modules.splice(destination.index, 0, movedItem);
+      // Moving between groups is not implemented in this version
+      toast.warning("Moving modules between groups is not supported currently");
     }
-
-    setItems(newItems);
   };
 
   const handleView = (item) => {
@@ -129,9 +134,9 @@ const Learn = ({ learningModules, toggleEditForm }) => {
   const handleDelete = async (id) => {
     let response = await learningService.deleteLearningModule(id);
     if (response.success) {
-      const newItems = items.map(group => ({
+      const newItems = items.map((group) => ({
         ...group,
-        modules: group.modules.filter(item => item._id !== id)
+        modules: group.modules.filter((item) => item._id !== id),
       }));
       setItems(newItems);
       toast.success(response.message, {
@@ -147,14 +152,22 @@ const Learn = ({ learningModules, toggleEditForm }) => {
   const handleToggleDisable = async (id) => {
     try {
       await learningService.toggleLearningModuleAbility(id);
-      const newItems = items.map(group => ({
+      const newItems = items.map((group) => ({
         ...group,
-        modules: group.modules.map(item =>
+        modules: group.modules.map((item) =>
           item._id === id ? { ...item, disabled: !item.disabled } : item
-        )
+        ),
       }));
       setItems(newItems);
-      toast.info(`Item ${newItems.find(group => group.modules.find(item => item._id === id)).modules.find(item => item._id === id).disabled ? "disabled" : "enabled"}`);
+      toast.info(
+        `Item ${
+          newItems
+            .find((group) => group.modules.find((item) => item._id === id))
+            .modules.find((item) => item._id === id).disabled
+            ? "disabled"
+            : "enabled"
+        }`
+      );
     } catch (error) {
       toast.error(`Failed to toggle item status`);
     }
@@ -177,13 +190,45 @@ const Learn = ({ learningModules, toggleEditForm }) => {
   };
 
   return (
-    <div style={{
-      padding: "20px",
-      fontFamily: "'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-      color: "#333",
-      maxWidth: "900px",
-      margin: "0 auto",
-    }}>
+    <div
+      style={{
+        padding: "20px",
+        fontFamily:
+          "'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+        color: "#333",
+        maxWidth: "900px",
+        margin: "0 auto",
+      }}
+    >
+      {isReordering && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "5px",
+              textAlign: "center",
+            }}
+          >
+            <p>Reordering modules...</p>
+            {/* You can add a spinner or loading animation here */}
+          </div>
+        </div>
+      )}
+
       <Modal opened={opened} fullScreen onClose={close} title={selectItem.name}>
         <h1 style={{ fontWeight: 900 }}>Reading Section</h1>
         <br />
@@ -205,7 +250,15 @@ const Learn = ({ learningModules, toggleEditForm }) => {
       <DragDropContext onDragEnd={onDragEnd}>
         {items.map((group) => (
           <div key={group.group._id} style={{ marginBottom: "30px" }}>
-            <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "15px" }}>{group.group.name}</h2>
+            <h2
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                marginBottom: "15px",
+              }}
+            >
+              {group.group.name} 
+            </h2>
             <Droppable droppableId={group.group._id}>
               {(provided, snapshot) => (
                 <div
@@ -214,7 +267,12 @@ const Learn = ({ learningModules, toggleEditForm }) => {
                   style={getListStyle(snapshot.isDraggingOver)}
                 >
                   {group.modules.map((item, index) => (
-                    <Draggable key={item._id} draggableId={item._id} index={index}>
+                    <Draggable
+                      key={item._id}
+                      draggableId={item._id}
+                      index={index}
+                      isDragDisabled={isReordering}
+                    >
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
@@ -226,28 +284,54 @@ const Learn = ({ learningModules, toggleEditForm }) => {
                           )}
                         >
                           <div style={{ fontSize: "18px", fontWeight: "bold" }}>
-                            {item.name}
+                            {item.name}  
                           </div>
-                          <div style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            gap: "8px",
-                            paddingTop: "10px",
-                          }}>
-                            <button onClick={() => handleView(item)} style={{ ...buttonStyle, backgroundColor: "#4CAF50" }}>
+                          <br/>
+                          <p className="text-sm text-gray-600">Order: {item.order}</p>
+                          
+                          <br/>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: "8px",
+                              paddingTop: "10px",
+                            }}
+                          >
+                            <button
+                              onClick={() => handleView(item)}
+                              style={{
+                                ...buttonStyle,
+                                backgroundColor: "#4CAF50",
+                              }}
+                            >
                               View
                             </button>
-                            <button onClick={() => handleEdit(item)} style={{ ...buttonStyle, backgroundColor: "#2196F3" }}>
+                            <button
+                              onClick={() => handleEdit(item)}
+                              style={{
+                                ...buttonStyle,
+                                backgroundColor: "#2196F3",
+                              }}
+                            >
                               Edit
                             </button>
-                            <button onClick={() => confirmDelete(item._id)} style={{ ...buttonStyle, backgroundColor: "#F44336" }}>
+                            <button
+                              onClick={() => confirmDelete(item._id)}
+                              style={{
+                                ...buttonStyle,
+                                backgroundColor: "#F44336",
+                              }}
+                            >
                               Delete
                             </button>
                             <button
                               onClick={() => handleToggleDisable(item._id)}
                               style={{
                                 ...buttonStyle,
-                                backgroundColor: item.disabled ? "#9E9E9E" : "#FF9800",
+                                backgroundColor: item.disabled
+                                  ? "#9E9E9E"
+                                  : "#FF9800",
                               }}
                             >
                               {item.disabled ? "Enable" : "Disable"}
@@ -268,7 +352,6 @@ const Learn = ({ learningModules, toggleEditForm }) => {
   );
 };
 
-
 export default function LearningQuiz() {
   const [tableAction, setTableAction] = useState(false);
   const [addUserForm, setAddUserForm] = useState(false);
@@ -276,7 +359,7 @@ export default function LearningQuiz() {
   const [userData, setUserData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [learningModules, setLearningModules] = useState([]);
-  const[editFormData, setEditFormData]  = useState({});
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     document.body.classList.remove("has--tabs");
@@ -343,15 +426,15 @@ export default function LearningQuiz() {
   };
 
   const toggleEditForm = (editFormData) => {
-    setEditUserForm(!editUserForm)
-    setEditFormData(editFormData)
-  }
+    setEditUserForm(!editUserForm);
+    setEditFormData(editFormData);
+  };
 
   const closeEditForm = () => {
-    setEditUserForm(false)
-    setEditFormData({})
+    setEditUserForm(false);
+    setEditFormData({});
     getLearningModules();
-  }
+  };
 
   return (
     <>
@@ -407,7 +490,9 @@ export default function LearningQuiz() {
             {editUserForm && <div className="layout--overlay--bg"></div>}
             <div
               className={
-                editUserForm ? "form--layout form--active overflow-auto" : "form--layout"
+                editUserForm
+                  ? "form--layout form--active overflow-auto"
+                  : "form--layout"
               }
             >
               <div
@@ -418,10 +503,8 @@ export default function LearningQuiz() {
               </div>
               {editUserForm && (
                 <EditHoliday
-                editFormData={editFormData}
-                
+                  editFormData={editFormData}
                   closeEditForm={closeEditForm}
-               
                 />
               )}
             </div>
@@ -430,9 +513,10 @@ export default function LearningQuiz() {
               {isLoading ? (
                 <FormSpinner />
               ) : (
-                <Learn 
-                toggleEditForm={toggleEditForm}
-                learningModules={learningModules} />
+                <Learn
+                  toggleEditForm={toggleEditForm}
+                  learningModules={learningModules}
+                />
               )}
             </div>
           </div>
@@ -448,11 +532,14 @@ const QuizComponent = ({ selectItem }) => {
       {selectItem?.questions &&
         selectItem.questions.map((question, index) => (
           <div key={question._id} className="mb-4">
-            <p className="font-semibold" style={{fontWeight: 900, color: 'black'}}>{`${index + 1}. ${question.text}`}</p>
-            <ul className="list-disc pl-6 mt-2" style={{ paddingLeft: '20px'}}>
+            <p
+              className="font-semibold"
+              style={{ fontWeight: 900, color: "black" }}
+            >{`${index + 1}. ${question.text}`}</p>
+            <ul className="list-disc pl-6 mt-2" style={{ paddingLeft: "20px" }}>
               {question.options.map((option, i) => (
                 <li
-                  style={{margin: 5}}
+                  style={{ margin: 5 }}
                   key={i}
                   className={`${
                     i === question.correctOption ? "text-green" : ""
