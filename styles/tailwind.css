@@ -22,6 +22,10 @@ html body {
   border-radius: 5px;
 }
 
+.overflow-auto{
+  overflow: auto;
+}
+
 .extraStockpicker input{
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   height: 2.25rem;
@@ -316,6 +320,13 @@ p {
   padding: 0.25rem 1rem;
   min-width: 9.625rem;
   border-radius: 0.5rem;
+}
+
+.text-green{
+  color: green
+} 
+.font-bold{
+ font-weight: 900;
 }
 
 .app_button svg {
