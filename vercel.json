@@ -1,0 +1,31 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "next.config.js",
+        "use": "@vercel/next"
+      }
+    ],
+    "git": {
+      "deploymentEnabled": {
+        "main": true,
+        "staging": true,
+        "feature/*": false
+      }
+    },
+    "env": {
+      "NEXT_PUBLIC_API_URL": "production-api-url"
+    },
+    "environments": {
+      "production": {
+        "env": {
+          "NEXT_PUBLIC_API_URL": "production-api-url"
+        }
+      },
+      "preview": {
+        "env": {
+          "NEXT_PUBLIC_API_URL": "staging-api-url"
+        }
+      }
+    }
+  }
