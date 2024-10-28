@@ -15,17 +15,5 @@
     },
     "env": {
       "NEXT_PUBLIC_API_URL": "production-api-url"
-    },
-    "environments": {
-      "production": {
-        "env": {
-          "NEXT_PUBLIC_API_URL": "production-api-url"
-        }
-      },
-      "preview": {
-        "env": {
-          "NEXT_PUBLIC_API_URL": "staging-api-url"
-        }
-      }
     }
   }
